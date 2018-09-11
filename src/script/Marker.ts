@@ -66,12 +66,12 @@ export class Marker {
         this.markList.current = new Mark(id, x, y, width, height);
     }
 
-    addMark() {
+    private addMark() {
         let _this = this;
         _this.markList.list.push(_this.markList.current);
     }
 
-    getMarkIndexById(id) {
+    private getMarkIndexById(id) {
         let _this = this,
             index = null;
 
@@ -88,7 +88,7 @@ export class Marker {
         return index;
     }
 
-    getSelectedMarkIndex() {
+    private getSelectedMarkIndex() {
         let _this = this;
         if ((typeof _this.selectedMark !== 'undefined') && (typeof _this.selectedMark.id !== 'undefined')) {
             return _this.getMarkIndexById(_this.selectedMark.id);
@@ -98,7 +98,7 @@ export class Marker {
         }
     }
 
-    getSelectedMark() {
+    private getSelectedMark() {
         let _this = this;
         let index = _this.getSelectedMarkIndex();
         if (index !== null) {
@@ -106,7 +106,7 @@ export class Marker {
         }
     }
 
-    setSelectedMark(index) {
+    private setSelectedMark(index) {
         let _this = this;
         let selectItem = _this.markList.list[index];
         _this.selectedOrigin = _this.getEventPosition(event);
@@ -120,24 +120,24 @@ export class Marker {
         // };
     }
 
-    getMarkList() {
+    private getMarkList() {
         let _this = this;
         return _this.markList.list;
     }
 
-    setMarkList(list) {
+    private setMarkList(list) {
         let _this = this;
         _this.markList.list = list;
     }
 
-    sortMarkList(index) {
+    private sortMarkList(index) {
         let _this = this;
         let selectedMark = _this.markList.list[index];
         _this.markList.list.splice(index, 1);
         _this.markList.list.push(selectedMark);
     }
 
-    setMarkOffset(event, itemIndex) {
+    private setMarkOffset(event, itemIndex) {
         let _this = this;
         let position = _this.getEventPosition(event);
         let offsetX = position.x - _this.selectedOrigin.x;
@@ -146,7 +146,7 @@ export class Marker {
         _this.markList.list[itemIndex].y = _this.selectedMark.y + offsetY;
     }
 
-    resizeMark(event, itemIndex, direction) {
+    private resizeMark(event, itemIndex, direction) {
         let _this = this;
         let point = _this.getEventPosition(event);
         let offsetW = point.x - _this.selectedOrigin.x;
@@ -179,7 +179,7 @@ export class Marker {
         });
     }
 
-    getMouseAction(event) {
+    private getMouseAction(event) {
         let _this = this;
         let action = {name: 'append', index: 0, direction: ''};
         let point = _this.getEventPosition(event);
@@ -235,7 +235,7 @@ export class Marker {
         return action;
     }
 
-    getImage(callback) {
+    private getImage(callback) {
         let _this = this;
         _this.image.src = _this.imageUrl;
         _this.image.onload = function () {
@@ -245,7 +245,7 @@ export class Marker {
         };
     }
 
-    getEventPosition(event) {
+    private getEventPosition(event) {
         let _this = this;
         return {
             x: (event.x + window.scrollX) / _this.scale.zoom,
@@ -253,7 +253,7 @@ export class Marker {
         };
     }
 
-    canAppendMark(event, success, failure) {
+    private canAppendMark(event, success, failure) {
         let _this = this;
         let point = _this.getEventPosition(event);
         let width = Math.abs(point.x - _this.origin.x);
@@ -266,12 +266,12 @@ export class Marker {
         }
     }
 
-    setOriginPoint(event) {
+    private setOriginPoint(event) {
         let _this = this;
         _this.origin = _this.getEventPosition(event);
     }
 
-    setCursorStyle(event, itemIndex) {
+    private setCursorStyle(event, itemIndex) {
         let _this = this;
         if (_this.markList.list.length <= 0) {
             return
@@ -339,7 +339,7 @@ export class Marker {
         _this.redraw();
     }
 
-    handleEvent() {
+    private handleEvent() {
         let _this = this,
             selectIndex = null,
             handler = {

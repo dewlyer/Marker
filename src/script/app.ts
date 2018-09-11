@@ -1,5 +1,5 @@
 // import bg from '../images/bg.jpg';
-import '../style/index.scss';
+import '../style/app.scss';
 import { Marker as PaperMarker } from './Marker';
 
 window.addEventListener('load', (event: WindowEventMap['load']): any => {

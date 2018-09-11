@@ -7,7 +7,7 @@ import * as ExtractTextPlugin from 'extract-text-webpack-plugin';
 const WebpackConfig: webpack.Configuration = {
     context: path.resolve(__dirname, './'),
     entry: {
-        main: './src/script/main.ts'
+        main: './src/script/app.ts'
     },
     output: {
         filename: '[name].bundle.js',
@@ -57,9 +57,9 @@ const WebpackConfig: webpack.Configuration = {
         new CleanWebpackPlugin('dist'),
         new HtmlWebpackPlugin({
             title: 'Output Management',
-            template: './src/index.html'
+            template: './src/app.html'
         }),
-        new ExtractTextPlugin('css/index.css'),
+        new ExtractTextPlugin('css/app.css'),
         new webpack.ProvidePlugin({
             $: 'jquery',
             jQuery: 'jquery'
