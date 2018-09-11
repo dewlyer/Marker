@@ -196,36 +196,27 @@ export class Marker {
                         if (point.x <= x1 + _this.scale.size) {
                             if (point.y <= y1 + _this.scale.size) {
                                 action.direction = 'left,top';
-                            }
-                            else if (point.y >= y2 - _this.scale.size) {
+                            } else if (point.y >= y2 - _this.scale.size) {
                                 action.direction = 'left,bottom';
-                            }
-                            else {
+                            } else {
                                 action.direction = 'left';
                             }
-                        }
-                        else if (point.x >= x2 - _this.scale.size) {
+                        } else if (point.x >= x2 - _this.scale.size) {
                             if (point.y <= y1 + _this.scale.size) {
                                 action.direction = 'right,top';
-                            }
-                            else if (point.y >= y2 - _this.scale.size) {
+                            } else if (point.y >= y2 - _this.scale.size) {
                                 action.direction = 'right,bottom';
-                            }
-                            else {
+                            } else {
                                 action.direction = 'right';
                             }
-                        }
-                        else if (point.y <= y1 + _this.scale.size) {
+                        } else if (point.y <= y1 + _this.scale.size) {
                             action.direction = 'top';
-                        }
-                        else if (point.y >= y2 - _this.scale.size) {
+                        } else if (point.y >= y2 - _this.scale.size) {
                             action.direction = 'bottom';
-                        }
-                        else {
+                        } else {
                             action.name = 'move';
                         }
-                    }
-                    else {
+                    } else {
                         action.name = 'move';
                     }
                 }
@@ -260,8 +251,7 @@ export class Marker {
         let height = Math.abs(point.y - _this.origin.y);
         if (width > 2 * _this.scale.size && height > 2 * _this.scale.size) {
             (typeof success === 'function') && success();
-        }
-        else {
+        } else {
             (typeof failure === 'function') && failure();
         }
     }
@@ -274,7 +264,7 @@ export class Marker {
     private setCursorStyle(event, itemIndex) {
         let _this = this;
         if (_this.markList.list.length <= 0) {
-            return
+            return;
         }
 
         let point = _this.getEventPosition(event);
@@ -287,36 +277,27 @@ export class Marker {
             if (point.x <= x1 + _this.scale.size) {
                 if (point.y <= y1 + _this.scale.size) {
                     style = 'cursor: nw-resize;';
-                }
-                else if (point.y >= y2 - _this.scale.size) {
+                } else if (point.y >= y2 - _this.scale.size) {
                     style = 'cursor: sw-resize;';
-                }
-                else {
+                } else {
                     style = 'cursor: w-resize;';
                 }
-            }
-            else if (point.x >= x2 - _this.scale.size) {
+            } else if (point.x >= x2 - _this.scale.size) {
                 if (point.y <= y1 + _this.scale.size) {
                     style = 'cursor: ne-resize;';
-                }
-                else if (point.y >= y2 - _this.scale.size) {
+                } else if (point.y >= y2 - _this.scale.size) {
                     style = 'cursor: se-resize;';
-                }
-                else {
+                } else {
                     style = 'cursor: e-resize;';
                 }
-            }
-            else if (point.y <= y1 + _this.scale.size) {
+            } else if (point.y <= y1 + _this.scale.size) {
                 style = 'cursor: n-resize;';
-            }
-            else if (point.y >= y2 - _this.scale.size) {
+            } else if (point.y >= y2 - _this.scale.size) {
                 style = 'cursor: s-resize;';
-            }
-            else {
+            } else {
                 style = 'cursor: move;';
             }
-        }
-        else {
+        } else {
             style = 'cursor: default;';
         }
         _this.canvas.style = style;
@@ -344,7 +325,9 @@ export class Marker {
             selectIndex = null,
             handler = {
                 mouseDown: function (e) {
-                    if (e.button !== 0) return;
+                    if (e.button !== 0) {
+                        return;
+                    }
                     let action = _this.getMouseAction(e);
                     if (action.name === 'move') {
                         _this.cursorEvent = 'move';
@@ -355,8 +338,7 @@ export class Marker {
                         _this.redraw(true);
                         _this.canvas.onmousemove = handler.selectMove;
                         _this.canvas.onmouseup = handler.selectUp;
-                    }
-                    else if (action.name === 'scale') {
+                    } else if (action.name === 'scale') {
                         _this.cursorEvent = 'scale';
                         _this.canvas.style = 'cursor: move;';
                         _this.setSelectedMark(action.index);
@@ -365,8 +347,7 @@ export class Marker {
                             handler.scaleMove(e, action.direction);
                         };
                         _this.canvas.onmouseup = handler.scaleUp;
-                    }
-                    else {
+                    } else {
                         // append rect
                         _this.cursorEvent = 'none';
                         _this.canvas.style = 'cursor: default;';
@@ -382,7 +363,9 @@ export class Marker {
                     _this.drawCurrentMark();
                 },
                 mouseUp: function (e) {
-                    if (e.button !== 0) return;
+                    if (e.button !== 0) {
+                        return;
+                    }
                     _this.canAppendMark(e, function () {
                         _this.setCurrentMark(e);
                         _this.addMark();
@@ -403,7 +386,9 @@ export class Marker {
                     _this.redraw(true);
                 },
                 selectUp: function (e) {
-                    if (e.button !== 0) return;
+                    if (e.button !== 0) {
+                        return;
+                    }
                     // selectIndex = _this.getSelectedMarkIndex();
                     _this.setMarkOffset(e, selectIndex);
                     _this.redraw(true);
@@ -417,7 +402,9 @@ export class Marker {
                     _this.redraw(true);
                 },
                 scaleUp: function (e) {
-                    if (e.button !== 0) return;
+                    if (e.button !== 0) {
+                        return;
+                    }
                     _this.redraw(true);
                     _this.canvas.onmousemove = handler.activeMove;
                     _this.canvas.onmouseup = null;
