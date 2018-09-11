@@ -12,7 +12,8 @@ export class Marker {
     private readonly imageUrl: string;
     private origin: { x: number, y: number };
     private scale: { size: number, zoom: number };
-    private settings: object;
+    private cursorEvent: string;
+    private settings: any;
     private selectedMark: Mark;
     private selectedOrigin: { x: number, y: number };
 
@@ -21,6 +22,25 @@ export class Marker {
         this.imageUrl = imageUrl;
         this.settings = Object.assign(Marker.defaults, options || {});
         this.initialize();
+    }
+
+    public getMarkList() {
+        let _this = this;
+        return _this.markList.list;
+    }
+
+    public getSelectedMark() {
+        let _this = this;
+        let index = _this.getSelectedMarkIndex();
+        if (index !== null) {
+            return _this.markList.list[index];
+        }
+    }
+
+    public setCanvasScale(scale: number): void {
+        let _this = this;
+        _this.scale.zoom *= scale;
+        _this.redraw();
     }
 
     public run(callback: () => void): void {
@@ -37,6 +57,23 @@ export class Marker {
                 console.warn('图片加载错误');
             }
         });
+    }
+
+    public clearCurrentMark() {
+        let itemIndex = this.getSelectedMarkIndex();
+        let id;
+        if (itemIndex !== null && this.cursorEvent === 'none') {
+            id = this.markList.getItemById(itemIndex).id;
+            this.clearMark(id);
+            this.canvas.onmousemove = null;
+        }
+    }
+
+    public clear() {
+        if (this.cursorEvent === 'none') {
+            this.clearMarkList();
+            this.redraw();
+        }
     }
 
     public getCurrentMark() {
@@ -79,8 +116,7 @@ export class Marker {
             if (item.id === id) {
                 index = i;
                 return false;
-            }
-            else {
+            } else {
                 return true;
             }
         });
@@ -92,17 +128,8 @@ export class Marker {
         let _this = this;
         if ((typeof _this.selectedMark !== 'undefined') && (typeof _this.selectedMark.id !== 'undefined')) {
             return _this.getMarkIndexById(_this.selectedMark.id);
-        }
-        else {
+        } else {
             return null;
-        }
-    }
-
-    private getSelectedMark() {
-        let _this = this;
-        let index = _this.getSelectedMarkIndex();
-        if (index !== null) {
-            return _this.markList.list[index];
         }
     }
 
@@ -118,11 +145,6 @@ export class Marker {
         //     x: selectItem.x,
         //     y: selectItem.y
         // };
-    }
-
-    private getMarkList() {
-        let _this = this;
-        return _this.markList.list;
     }
 
     private setMarkList(list) {
@@ -159,19 +181,16 @@ export class Marker {
                     _this.markList.list[itemIndex].x = _this.selectedMark.x + offsetW;
                     _this.markList.list[itemIndex].width = _this.selectedMark.width - offsetW;
                 }
-            }
-            else if (item === 'right') {
+            } else if (item === 'right') {
                 if (offsetW >= 0 || _this.markList.list[itemIndex].width >= 2 * _this.scale.size) {
                     _this.markList.list[itemIndex].width = _this.selectedMark.width + offsetW;
                 }
-            }
-            else if (item === 'top') {
+            } else if (item === 'top') {
                 if (offsetH <= 0 || _this.markList.list[itemIndex].height > 2 * _this.scale.size) {
                     _this.markList.list[itemIndex].y = _this.selectedMark.y + offsetH;
                     _this.markList.list[itemIndex].height = _this.selectedMark.height - offsetH;
                 }
-            }
-            else if (item === 'bottom') {
+            } else if (item === 'bottom') {
                 if (offsetH >= 0 || _this.markList.list[itemIndex].height >= 2 * _this.scale.size) {
                     _this.markList.list[itemIndex].height = _this.selectedMark.height + offsetH;
                 }
@@ -250,9 +269,13 @@ export class Marker {
         let width = Math.abs(point.x - _this.origin.x);
         let height = Math.abs(point.y - _this.origin.y);
         if (width > 2 * _this.scale.size && height > 2 * _this.scale.size) {
-            (typeof success === 'function') && success();
+            if (typeof success === 'function') {
+                success();
+            }
         } else {
-            (typeof failure === 'function') && failure();
+            if (typeof failure === 'function') {
+                failure();
+            }
         }
     }
 
@@ -312,12 +335,6 @@ export class Marker {
 
     private getCanvasScale(): number {
         return this.scale.zoom;
-    }
-
-    private setCanvasScale(scale: number): void {
-        let _this = this;
-        _this.scale.zoom *= scale;
-        _this.redraw();
     }
 
     private handleEvent() {
@@ -435,23 +452,6 @@ export class Marker {
 
     private clearSelectedMark() {
         this.selectedMark = null;
-    }
-
-    private clearCurrentMark() {
-        let itemIndex = this.getSelectedMarkIndex();
-        let id;
-        if (itemIndex !== null && this.cursorEvent === 'none') {
-            id = this.markList.getItemById(itemIndex).id;
-            this.clearMark(id);
-            this.canvas.onmousemove = null;
-        }
-    }
-
-    private clear() {
-        if (this.cursorEvent === 'none') {
-            this.clearMarkList();
-            this.redraw();
-        }
     }
 
     // draw

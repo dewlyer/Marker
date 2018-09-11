@@ -51,7 +51,7 @@ window.addEventListener('load', (event: WindowEventMap['load']): any => {
         },
         clearRectSelectKey(e: HTMLElementEventMap['keyup']): void {
             if (e.code === '8' || e.code === '46') {
-                paperMarker.clearCurRect();
+                paperMarker.clearCurrentMark();
             }
         }
     };
