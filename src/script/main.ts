@@ -1,68 +1,71 @@
+// import bg from '../images/bg.jpg';
 import '../style/index.scss';
-import bg from '../images/bg.jpg';
-import { PaperMarker } from './paperMarker';
+import { Marker as PaperMarker } from './paperMarker';
 
-window.onload = () => {
-
-    let [canvas, imageUrl] = [document.getElementById('canvas'), bg];
-    let paperMarker, events;
-
-    if (!PaperMarker) {
-        return;
-    }
+window.addEventListener('load', (event: WindowEventMap['load']): any => {
+    let canvas = document.getElementById('canvas');
+    let imageUrl = require('../images/bg.jpg');
+    let paperMarker: PaperMarker;
+    let events: object;
 
     paperMarker = new PaperMarker(canvas, imageUrl);
 
     events = {
-        clearRectList() {
+        clearRectList(e: HTMLElementEventMap['click']): void {
+            console.log(e);
             paperMarker.clear();
         },
-        clearRectSelect() {
+        clearRectSelect(e: HTMLElementEventMap['click']): void {
+            console.log(e);
             paperMarker.clearCurrentMark();
         },
-        getRectListInfo() {
+        getRectListInfo(e: HTMLElementEventMap['click']): void {
+            console.log(e);
             let rectList = paperMarker.getMarkList();
             if (rectList.length > 0) {
                 console.log(rectList);
-                alert(JSON.stringify(rectList));
+                window.alert(JSON.stringify(rectList));
             } else {
-                alert('没有可输出的信息');
+                window.alert('没有可输出的信息');
             }
         },
-        getRectSelectInfo() {
+        getRectSelectInfo(e: HTMLElementEventMap['click']): void {
+            console.log(e);
             let selectRect = paperMarker.getSelectedMark();
             if (selectRect) {
-                let str = `ID: ${selectRect.id} - X: ${selectRect.x}
-- Y: ${selectRect.y} - W: ${selectRect.width} - H: ${selectRect.height}`;
-                // let str = 'ID : ' + selectRect.id + '\n';
-                // str += 'X : ' + selectRect.x + '\n';
-                // str += 'Y : ' + selectRect.y + '\n';
-                // str += 'Width : ' + selectRect.width + '\n';
-                // str += 'Height :' + selectRect.height;
-                alert(str);
+                let str = `ID: ${selectRect.id} - X: ${selectRect.x} - Y: ${selectRect.y} - `;
+                str += `W: ${selectRect.width} - H: ${selectRect.height}`;
                 console.log(selectRect);
+                window.alert(str);
             } else {
-                alert('没有选中的目标');
+                window.alert('没有选中的目标');
             }
         },
-        setRectScaleUp() {
+        setRectScaleUp(e: HTMLElementEventMap['click']): void {
+            console.log(e);
             paperMarker.setCanvasScale(2);
         },
-        setRectScaleDown() {
+        setRectScaleDown(e: HTMLElementEventMap['click']): void {
+            console.log(e);
             paperMarker.setCanvasScale(0.5);
         },
-        clearRectSelectKey(ev) {
-            if (ev.keyCode === 8 || ev.keyCode === 46) {
+        clearRectSelectKey(e: HTMLElementEventMap['keyup']): void {
+            if (e.code === '8' || e.code === '46') {
                 paperMarker.clearCurRect();
             }
-        },
+        }
     };
 
-    paperMarker.run(() => {
+    paperMarker.run((): void => {
+        let listener: EventListener;
         for (let key in events) {
             if (events.hasOwnProperty(key)) {
-                key === 'clearRectSelectKey' ? $(document).on('keyup', events[key]) : $('#' + key).on('click', events[key]);
+                listener = events[key];
+                key === 'clearRectSelectKey' ? document.addEventListener('keyup', listener) :
+                    document.getElementById(key).addEventListener('click', listener);
             }
         }
     });
-};
+
+    console.log(event);
+});

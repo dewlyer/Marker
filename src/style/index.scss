@@ -4,15 +4,21 @@
   border: 0;
 }
 
+body {
+  font-size: 12px;
+}
+
 .canvas-wrap {
 
 }
+
 .canvas-buts {
   position: fixed;
   z-index: 10;
   right: 0;
   top: 0;
 }
+
 .canvas-button {
   margin-right: 10px;
   margin-top: 10px;
@@ -20,6 +26,7 @@
   background: #666;
   color: #fff;
 }
+
 .canvas {
 
 }

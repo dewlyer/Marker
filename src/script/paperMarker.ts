@@ -591,4 +591,4 @@ class PaperMarker {
     }
 }
 
-export { PaperMarker };
+export { PaperMarker as Marker };
