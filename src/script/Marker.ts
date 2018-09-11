@@ -2,22 +2,24 @@ import { Mark } from './Mark';
 import { MarkList } from './MarkList';
 import { Defaults } from './Defaults';
 
-class PaperMarker {
+export class Marker {
+    private static defaults = Defaults;
+
     private markList: MarkList;
     private canvas: HTMLCanvasElement;
-    private image: HTMLImageElement;
-    private imageUrl: string;
     private canvasCtx: CanvasRenderingContext2D;
+    private image: HTMLImageElement;
+    private readonly imageUrl: string;
     private origin: { x: number, y: number };
     private scale: { size: number, zoom: number };
     private settings: object;
     private selectedMark: Mark;
     private selectedOrigin: { x: number, y: number };
 
-    public constructor(canvas, imageUrl, options?) {
+    public constructor(canvas: HTMLCanvasElement, imageUrl: string, options?: any) {
         this.canvas = canvas;
         this.imageUrl = imageUrl;
-        this.settings = Object.assign(Defaults, options);
+        this.settings = Object.assign(Marker.defaults, options || {});
         this.initialize();
     }
 
@@ -590,5 +592,3 @@ class PaperMarker {
         this.selectedMark = null;
     }
 }
-
-export { PaperMarker as Marker };

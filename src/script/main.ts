@@ -1,6 +1,6 @@
 // import bg from '../images/bg.jpg';
 import '../style/index.scss';
-import { Marker as PaperMarker } from './paperMarker';
+import { Marker as PaperMarker } from './Marker';
 
 window.addEventListener('load', (event: WindowEventMap['load']): any => {
     let canvas = document.getElementById('canvas');
