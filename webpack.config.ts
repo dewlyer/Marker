@@ -29,6 +29,12 @@ const WebpackConfig: webpack.Configuration = {
                 ]
             },
             {
+                test: /\.ts$/,
+                loader: 'lodash-ts-webpack-plugin',
+                exclude: /node_modules/,
+                enforce: 'pre'
+            },
+            {
                 test: /\.tsx?$/,
                 loader: 'ts-loader',
                 exclude: [

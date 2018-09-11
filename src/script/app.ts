@@ -3,7 +3,8 @@ import '../style/app.scss';
 import { Marker as PaperMarker } from './Marker';
 
 window.addEventListener('load', (event: WindowEventMap['load']): any => {
-    let canvas = document.getElementById('canvas');
+    // @ts-ignore
+    let canvas: HTMLCanvasElement = document.getElementById('canvas');
     let imageUrl = require('../images/bg.jpg');
     let paperMarker: PaperMarker;
     let events: object;

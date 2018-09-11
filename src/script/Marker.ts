@@ -1,13 +1,16 @@
+import * as _ from 'lodash';
 import { Mark } from './Mark';
 import { MarkList } from './MarkList';
+import { MarkCanvas } from './Canvas';
+import { MarkImage } from './';
 import { Defaults } from './Defaults';
 
 export class Marker {
     private static defaults = Defaults;
 
     private markList: MarkList;
-    private canvas: HTMLCanvasElement;
-    private canvasCtx: CanvasRenderingContext2D;
+    private canvas: Canvas;
+    // private canvasCtx: CanvasRenderingContext2D;
     private image: HTMLImageElement;
     private readonly imageUrl: string;
     private origin: { x: number, y: number };
@@ -18,9 +21,9 @@ export class Marker {
     private selectedOrigin: { x: number, y: number };
 
     public constructor(canvas: HTMLCanvasElement, imageUrl: string, options?: any) {
-        this.canvas = canvas;
+        this.canvas = new Canvas(canvas);
         this.imageUrl = imageUrl;
-        this.settings = Object.assign(Marker.defaults, options || {});
+        this.settings = _.extend(Marker.defaults, options || {});
         this.initialize();
     }
 
@@ -47,7 +50,7 @@ export class Marker {
         let _this = this;
         this.initImageObj(() => {
             if (_this.image.src) {
-                _this.drawBackgroundImage();
+                _this.canvas.drawBackground(this.image);
                 _this.handleEvent();
                 _this.initData();
                 if (typeof callback === 'function') {
@@ -323,7 +326,8 @@ export class Marker {
         } else {
             style = 'cursor: default;';
         }
-        _this.canvas.style = style;
+
+        _this.canvas.setStyle(style);
     }
 
     private getImageSize(): { width: number, height: number } {
@@ -338,105 +342,105 @@ export class Marker {
     }
 
     private handleEvent() {
-        let _this = this,
-            selectIndex = null,
-            handler = {
-                mouseDown: function (e) {
-                    if (e.button !== 0) {
-                        return;
-                    }
-                    let action = _this.getMouseAction(e);
-                    if (action.name === 'move') {
-                        _this.cursorEvent = 'move';
-                        _this.canvas.style = 'cursor: move;';
-                        _this.setSelectedMark(action.index);
-                        _this.sortMarkList(action.index);
-                        selectIndex = _this.getSelectedMarkIndex();
-                        _this.redraw(true);
-                        _this.canvas.onmousemove = handler.selectMove;
-                        _this.canvas.onmouseup = handler.selectUp;
-                    } else if (action.name === 'scale') {
-                        _this.cursorEvent = 'scale';
-                        _this.canvas.style = 'cursor: move;';
-                        _this.setSelectedMark(action.index);
-                        selectIndex = _this.getSelectedMarkIndex();
-                        _this.canvas.onmousemove = function (e) {
-                            handler.scaleMove(e, action.direction);
-                        };
-                        _this.canvas.onmouseup = handler.scaleUp;
-                    } else {
-                        // append rect
-                        _this.cursorEvent = 'none';
-                        _this.canvas.style = 'cursor: default;';
-                        _this.setOriginPoint(e);
-                        _this.clearSelectedMark();
-                        _this.canvas.onmousemove = handler.mouseMove;
-                        _this.canvas.onmouseup = handler.mouseUp;
-                    }
-                },
-                mouseMove: function (e) {
-                    _this.setCurrentMark(e);
-                    _this.redraw();
-                    _this.drawCurrentMark();
-                },
-                mouseUp: function (e) {
-                    if (e.button !== 0) {
-                        return;
-                    }
-                    _this.canAppendMark(e, function () {
-                        _this.setCurrentMark(e);
-                        _this.addMark();
-                    }, function () {
-                        // alert('所选区域太小，请重现选取！');
-                    });
-                    _this.redraw();
-                    _this.canvas.onmousemove = null;
-                    _this.canvas.onmouseup = null;
-                },
-                activeMove: function (e) {
-                    // selectIndex = _this.getSelectedMarkIndex();
-                    _this.setCursorStyle(e, selectIndex);
-                },
-                selectMove: function (e) {
-                    // selectIndex = _this.getSelectedMarkIndex();
-                    _this.setMarkOffset(e, selectIndex);
-                    _this.redraw(true);
-                },
-                selectUp: function (e) {
-                    if (e.button !== 0) {
-                        return;
-                    }
-                    // selectIndex = _this.getSelectedMarkIndex();
-                    _this.setMarkOffset(e, selectIndex);
-                    _this.redraw(true);
-                    _this.canvas.onmousemove = handler.activeMove;
-                    _this.canvas.onmouseup = null;
-                    _this.cursorEvent = 'none';
-                },
-                scaleMove: function (e, direction) {
-                    // selectIndex = _this.getSelectedMarkIndex();
-                    _this.resizeMark(e, selectIndex, direction);
-                    _this.redraw(true);
-                },
-                scaleUp: function (e) {
-                    if (e.button !== 0) {
-                        return;
-                    }
-                    _this.redraw(true);
-                    _this.canvas.onmousemove = handler.activeMove;
-                    _this.canvas.onmouseup = null;
-                    _this.cursorEvent = 'none';
+        let _this = this;
+        let selectIndex = null;
+        let handler = {
+            mouseDown: function (e) {
+                if (e.button !== 0) {
+                    return;
                 }
-            };
+                let action = _this.getMouseAction(e);
+                if (action.name === 'move') {
+                    _this.cursorEvent = 'move';
+                    _this.canvas.setStyle('cursor: move');
+                    _this.setSelectedMark(action.index);
+                    _this.sortMarkList(action.index);
+                    selectIndex = _this.getSelectedMarkIndex();
+                    _this.redraw(true);
+                    _this.canvas.addEvent('mousemove', handler.selectMove);
+                    _this.canvas.addEvent('mouseup', handler.selectUp);
+                } else if (action.name === 'scale') {
+                    _this.cursorEvent = 'scale';
+                    _this.canvas.setStyle('cursor: move');
+                    _this.setSelectedMark(action.index);
+                    selectIndex = _this.getSelectedMarkIndex();
 
-        _this.canvas.onmousedown = handler.mouseDown;
+                    // _this.canvas.onmousemove = function (ev) {
+                    //     handler.scaleMove(ev, action.direction);
+                    // };
+
+                    _this.canvas.addEvent('ousemove', handler.scaleMove);
+                    _this.canvas.addEvent('mouseup', handler.scaleUp);
+                } else {
+                    // append rect
+                    _this.cursorEvent = 'none';
+                    _this.canvas.setStyle('cursor: default');
+                    _this.setOriginPoint(e);
+                    _this.clearSelectedMark();
+
+                    _this.canvas.addEvent('ousemove', handler.mouseMove);
+                    _this.canvas.addEvent('mouseup', handler.mouseUp);
+                }
+            },
+            mouseMove: function (e) {
+                _this.setCurrentMark(e);
+                _this.redraw();
+                _this.drawCurrentMark();
+            },
+            mouseUp: function (e) {
+                if (e.button !== 0) {
+                    return;
+                }
+                _this.canAppendMark(e, function () {
+                    _this.setCurrentMark(e);
+                    _this.addMark();
+                }, function () {
+                    // alert('所选区域太小，请重现选取！');
+                });
+                _this.redraw();
+                _this.canvas.onmousemove = null;
+                _this.canvas.onmouseup = null;
+            },
+            activeMove: function (e) {
+                // selectIndex = _this.getSelectedMarkIndex();
+                _this.setCursorStyle(e, selectIndex);
+            },
+            selectMove: function (e) {
+                // selectIndex = _this.getSelectedMarkIndex();
+                _this.setMarkOffset(e, selectIndex);
+                _this.redraw(true);
+            },
+            selectUp: function (e) {
+                if (e.button !== 0) {
+                    return;
+                }
+                // selectIndex = _this.getSelectedMarkIndex();
+                _this.setMarkOffset(e, selectIndex);
+                _this.redraw(true);
+                _this.canvas.onmousemove = handler.activeMove;
+                _this.canvas.onmouseup = null;
+                _this.cursorEvent = 'none';
+            },
+            scaleMove: function (e, direction) {
+                // selectIndex = _this.getSelectedMarkIndex();
+                _this.resizeMark(e, selectIndex, direction);
+                _this.redraw(true);
+            },
+            scaleUp: function (e) {
+                if (e.button !== 0) {
+                    return;
+                }
+                _this.redraw(true);
+                _this.canvas.onmousemove = handler.activeMove;
+                _this.canvas.onmouseup = null;
+                _this.cursorEvent = 'none';
+            }
+        };
+
+        this.canvas.addEvent('mousedown', handler.mouseDown);
     }
 
     // clear
-
-    private clearCanvas(): void {
-        this.canvasCtx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    }
 
     private clearMarkList(): void {
         this.markList.list = [];
@@ -460,8 +464,7 @@ export class Marker {
         let scale = this.getCanvasScale();
         let {width, height} = this.getImageSize();
 
-        this.canvas.width = width * scale;
-        this.canvas.height = height * scale;
+        this.canvas.setSize(width, height);
         this.canvasCtx.drawImage(this.image, 0, 0, width, height);
     }
 
@@ -549,8 +552,8 @@ export class Marker {
     }
 
     private redraw(selected?: boolean): void {
-        this.clearCanvas();
-        this.drawBackgroundImage();
+        this.canvas.clear();
+        this.canvas.drawBackground(this.image);
         this.drawMarkList(selected);
     }
 
@@ -575,7 +578,6 @@ export class Marker {
         this.origin = {x: 0, y: 0};
         this.image = new Image();
         this.markList = new MarkList([]);
-        this.canvasCtx = this.canvas.getContext('2d');
         this.selectedMark = null;
     }
 }
