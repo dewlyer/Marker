@@ -1,39 +1,33 @@
 export class MarkImage {
-    private ctx: CanvasRenderingContext2D;
-    private scale: number;
+    private el: HTMLImageElement;
 
-    public constructor(private el: HTMLCanvasElement) {
+    public constructor(private src: string) {
         this.initialize();
     }
 
-    public addEvent(type, listener) {
-        this.el.addEventListener(type, listener);
+    public loadComplete(callback: () => void): void {
+        this.el.src = this.src;
+        this.el.addEventListener('load', () => {
+            callback();
+        });
     }
 
-    public removeEvent(type, listener) {
-        this.el.removeEventListener(type, listener);
+    public hasSource() {
+        return !!this.el.src;
     }
 
-    public setSize(width, height) {
-        this.el.width = width * this.scale;
-        this.el.height = height * this.scale;
+    public getElement() {
+        return this.el;
     }
 
-    public setStyle(style) {
-        this.el.setAttribute('style', style);
-    }
-
-    public drawBackground(image): void {
-        this.setSize(width, height);
-        this.ctx.drawImage(image, 0, 0, width, height);
-    }
-
-    public clear() {
-        this.ctx.clearRect(0, 0, this.el.width, this.el.height);
+    public getSize(): { width: number, height: number } {
+        return {
+            width: this.el.naturalWidth || this.el.width,
+            height: this.el.naturalHeight || this.el.height
+        };
     }
 
     private initialize() {
-        this.scale = 1;
-        this.ctx = this.el.getContext('2d');
+        this.el = new Image();
     }
 }
