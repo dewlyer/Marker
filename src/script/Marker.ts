@@ -17,7 +17,44 @@ export class Marker {
     private selectedOrigin: { x: number, y: number };
 
     public constructor(canvas: HTMLCanvasElement, imageUrl: string, options?: any) {
-        this.canvas = new MarkCanvas(canvas, imageUrl);
+        this.canvas = new MarkCanvas(canvas, imageUrl, {
+            line: {
+                join: {
+                    normal: this.settings.line.join,
+                    active: this.settings.line.join,
+                    select: this.settings.line.join
+                },
+                dash: {
+                    normal: this.settings.line.dash,
+                    active: this.settings.line.dash,
+                    select: this.settings.line.dash
+                },
+                width: {
+                    normal: this.settings.line.width,
+                    active: this.settings.line.width,
+                    select: this.settings.line.width
+                },
+                color: {
+                    normal: this.settings.line.color.normal,
+                    active: this.settings.line.color.active,
+                    select: this.settings.line.color.select
+                }
+            },
+            rect: {
+                color: {
+                    normal: this.settings.rect.color.normal,
+                    active: this.settings.rect.color.active,
+                    select: this.settings.rect.color.select
+                }
+            },
+            text: {
+                font: this.settings.text.font,
+                color: {
+                    normal: this.settings.line.color.normal,
+                    select: this.settings.line.color.select
+                }
+            }
+        });
         this.settings = _.extend(Marker.defaults, options || {});
         this.initialize();
     }
@@ -35,10 +72,11 @@ export class Marker {
         }
     }
 
-    public setCanvasScale(scale: number): void {
-        let _this = this;
-        _this.scale.zoom *= scale;
-        _this.canvas.redraw();
+    public setCanvasScale(zoom: number): void {
+        let scale = this.canvas.getScale();
+        scale *= zoom;
+        this.canvas.setScale(scale);
+        this.canvas.redraw(this.markList);
     }
 
     public run(callback: () => void): void {
@@ -66,7 +104,7 @@ export class Marker {
     public clear() {
         if (this.cursorEvent === 'none') {
             this.clearMarkList();
-            this.canvas.redraw();
+            this.canvas.redraw(this.markList);
         }
     }
 
@@ -327,7 +365,7 @@ export class Marker {
                     _this.setSelectedMark(action.index);
                     _this.sortMarkList(action.index);
                     selectIndex = _this.getSelectedMarkIndex();
-                    _this.canvas.redraw(true);
+                    _this.canvas.redraw(_this.markList, selectIndex);
                     _this.canvas.addEvent('mousemove', handler.selectMove);
                     _this.canvas.addEvent('mouseup', handler.selectUp);
                 } else if (action.name === 'scale') {
@@ -355,8 +393,8 @@ export class Marker {
             },
             mouseMove: function (e) {
                 _this.setCurrentMark(e);
-                _this.canvas.redraw();
-                _this.canvas.drawCurrentMark();
+                _this.canvas.redraw(_this.markList);
+                _this.canvas.drawCurrentMark(_this.getCurrentMark());
             },
             mouseUp: function (e) {
                 if (e.button !== 0) {
@@ -368,7 +406,7 @@ export class Marker {
                 }, function () {
                     // alert('所选区域太小，请重现选取！');
                 });
-                _this.canvas.redraw();
+                _this.canvas.redraw(_this.markList);
                 _this.canvas.onmousemove = null;
                 _this.canvas.onmouseup = null;
             },
@@ -379,7 +417,7 @@ export class Marker {
             selectMove: function (e) {
                 // selectIndex = _this.getSelectedMarkIndex();
                 _this.setMarkOffset(e, selectIndex);
-                _this.canvas.redraw(true);
+                _this.canvas.redraw(_this.markList,selectIndex);
             },
             selectUp: function (e) {
                 if (e.button !== 0) {
@@ -387,7 +425,7 @@ export class Marker {
                 }
                 // selectIndex = _this.getSelectedMarkIndex();
                 _this.setMarkOffset(e, selectIndex);
-                _this.canvas.redraw(true);
+                _this.canvas.redraw(_this.markList,selectIndex);
                 _this.canvas.onmousemove = handler.activeMove;
                 _this.canvas.onmouseup = null;
                 _this.cursorEvent = 'none';
@@ -395,13 +433,13 @@ export class Marker {
             scaleMove: function (e, direction) {
                 // selectIndex = _this.getSelectedMarkIndex();
                 _this.resizeMark(e, selectIndex, direction);
-                _this.canvas.redraw(true);
+                _this.canvas.redraw(_this.markList, selectIndex);
             },
             scaleUp: function (e) {
                 if (e.button !== 0) {
                     return;
                 }
-                _this.canvas.redraw(true);
+                _this.canvas.redraw(_this.markList, selectIndex);
                 _this.canvas.onmousemove = handler.activeMove;
                 _this.canvas.onmouseup = null;
                 _this.cursorEvent = 'none';
@@ -421,7 +459,7 @@ export class Marker {
         let index = this.getMarkIndexById(id);
         if (index !== null) {
             this.markList.list.splice(index, 1);
-            this.canvas.redraw();
+            this.canvas.redraw(this.markList);
         }
     }
 
@@ -434,7 +472,7 @@ export class Marker {
     private initData(): void {
         if (this.settings.data && this.settings.data.length > 0) {
             this.markList = this.settings.data;
-            this.canvas.redraw();
+            this.canvas.redraw(this.markList);
         }
     }
 
