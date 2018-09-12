@@ -20,12 +20,16 @@ export class MarkCanvas {
         this.scale = scale;
     }
 
-    public addEvent(type, listener) {
-        this.el.addEventListener(type, listener);
+    public addEvent(type, target, listener) {
+        this.el.addEventListener(type,  (e) => {
+            target[listener](e);
+        });
     }
 
-    public removeEvent(type, listener) {
-        this.el.removeEventListener(type, listener);
+    public removeEvent(type, target, listener) {
+        this.el.removeEventListener(type,  (e) => {
+            target[listener](e);
+        });
     }
 
     public setSize(width, height) {
