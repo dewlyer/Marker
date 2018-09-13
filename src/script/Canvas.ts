@@ -1,3 +1,4 @@
+import * as $ from 'jquery';
 import { MarkImage } from './Image';
 import { MarkList } from './MarkList';
 import { Mark } from './Mark';
@@ -20,16 +21,14 @@ export class MarkCanvas {
         this.scale = scale;
     }
 
-    public addEvent(type, target, listener) {
-        this.el.addEventListener(type,  (e) => {
-            target[listener](e);
+    public addEvent(scope, type, namespace, listener) {
+        $(this.el).on(type + '.' + namespace, (e) => {
+            listener(e, scope);
         });
     }
 
-    public removeEvent(type, target, listener) {
-        this.el.removeEventListener(type,  (e) => {
-            target[listener](e);
-        });
+    public removeEvent(scope, type, namespace, listener) {
+        $(this.el).off(type + '.' + namespace);
     }
 
     public setSize(width, height) {

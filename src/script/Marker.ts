@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import * as $ from 'jquery';
 import { Mark } from './Mark';
 import { MarkList } from './MarkList';
 import { MarkCanvas } from './Canvas';
@@ -21,7 +22,7 @@ export class Marker {
     private action: any;
 
     public constructor(canvas: HTMLCanvasElement, imageUrl: string, options?: any) {
-        this.settings = _.extend(Marker.defaults, options || {});
+        this.settings = $.extend(Marker.defaults, options || {});
         this.canvas = new MarkCanvas(canvas, imageUrl, {
             line: {
                 join: {
@@ -101,7 +102,7 @@ export class Marker {
         if (itemIndex !== null && this.cursorEvent === 'none') {
             id = this.markList.getItemById(itemIndex).id;
             this.clearMark(id);
-            this.canvas.removeEvent('mousemove', this, 'mouseMoveHandler');
+            this.canvas.removeEvent(this, 'mousemove', 'mousemove', this.mouseMoveHandler);
         }
     }
 
@@ -354,101 +355,103 @@ export class Marker {
 
     // events
 
-    private mouseDownHandler(e) {
+    private mouseDownHandler(e, _this) {
         if (e.button !== 0) {
             return;
         }
-        this.action = this.getMouseAction(e);
-        if (this.action.name === 'move') {
-            this.cursorEvent = 'move';
-            this.canvas.setStyle('cursor: move');
-            this.setSelectedMark(this.action.index);
-            this.sortMarkList(this.action.index);
-            this.selectIndex = this.getSelectedMarkIndex();
-            this.canvas.redraw(this.markList, this.selectIndex);
-            this.canvas.addEvent('mousemove', this, 'selectMoveHandler');
-            this.canvas.addEvent('mouseup', this, 'selectUpHandler');
-        } else if (this.action.name === 'scale') {
-            this.cursorEvent = 'scale';
-            this.canvas.setStyle('cursor: move');
-            this.setSelectedMark(this.action.index);
-            this.selectIndex = this.getSelectedMarkIndex();
-            this.canvas.addEvent('ousemove', this, 'scaleMoveHandler');
-            this.canvas.addEvent('mouseup', this, 'scaleUpHandler');
+        _this.action = _this.getMouseAction(e);
+        if (_this.action.name === 'move') {
+            _this.cursorEvent = 'move';
+            _this.canvas.setStyle('cursor: move');
+            _this.setSelectedMark(_this.action.index);
+            _this.sortMarkList(_this.action.index);
+            _this.selectIndex = _this.getSelectedMarkIndex();
+            _this.canvas.redraw(_this.markList, _this.selectIndex);
+            _this.canvas.addEvent(_this, 'mousemove', 'selectmove', _this.selectMoveHandler);
+            _this.canvas.addEvent(_this, 'mouseup', 'selectup', _this.selectUpHandler);
+        } else if (_this.action.name === 'scale') {
+            _this.cursorEvent = 'scale';
+            _this.canvas.setStyle('cursor: move');
+            _this.setSelectedMark(_this.action.index);
+            _this.selectIndex = _this.getSelectedMarkIndex();
+            _this.canvas.addEvent(_this, 'ousemove', 'scalemove', _this.scaleMoveHandler);
+            _this.canvas.addEvent(_this, 'mouseup', 'scaleup', _this.scaleUpHandler);
         } else {
             // append rect
-            this.cursorEvent = 'none';
-            this.canvas.setStyle('cursor: default');
-            this.setOriginPoint(e);
-            this.clearSelectedMark();
+            _this.cursorEvent = 'none';
+            _this.canvas.setStyle('cursor: default');
+            _this.setOriginPoint(e);
+            _this.clearSelectedMark();
 
-            this.canvas.addEvent('ousemove', this, 'mouseMoveHandler');
-            this.canvas.addEvent('mouseup', this, 'mouseUpHandler');
+            _this.canvas.addEvent(_this, 'ousemove', 'mousemove', _this.mouseMoveHandler);
+            _this.canvas.addEvent(_this, 'mouseup', 'mouseup', _this.mouseUpHandler);
         }
     }
 
-    private mouseMoveHandler(e) {
-        this.setCurrentMark(e);
-        this.canvas.redraw(this.markList);
-        this.canvas.drawCurrentMark(this.getCurrentMark());
+    private mouseMoveHandler(e, _this) {
+        _this.setCurrentMark(e);
+        _this.canvas.redraw(_this.markList);
+        _this.canvas.drawCurrentMark(_this.getCurrentMark());
     }
-    private mouseUpHandler(e) {
-        let _this = this;
+
+    private mouseUpHandler(e, _this) {
         if (e.button !== 0) {
             return;
         }
-        this.canAppendMark(e, function () {
+        _this.canAppendMark(e, function () {
             _this.setCurrentMark(e);
             _this.addMark();
         }, function () {
             // alert('所选区域太小，请重现选取！');
         });
-        this.canvas.redraw(_this.markList);
-        this.canvas.removeEvent('mousemove', this, 'mouseMoveHandler');
-        this.canvas.removeEvent('mouseup', this, 'mouseUpHandler');
+        _this.canvas.redraw(_this.markList);
+        _this.canvas.removeEvent(_this, 'mousemove', 'mousemove', _this.mouseMoveHandler);
+        _this.canvas.removeEvent(_this, 'mouseup', 'mouseup', _this.mouseUpHandler);
     }
 
-    private selectMoveHandler(e) {
+    private selectMoveHandler(e, _this) {
         // selectIndex = _this.getSelectedMarkIndex();
-        this.setMarkOffset(e, this.selectIndex);
-        this.canvas.redraw(this.markList, this.selectIndex);
+        _this.setMarkOffset(e, _this.selectIndex);
+        _this.canvas.redraw(_this.markList, _this.selectIndex);
     }
-    private selectUpHandler(e) {
+
+    private selectUpHandler(e, _this) {
         if (e.button !== 0) {
             return;
         }
         // selectIndex = _this.getSelectedMarkIndex();
-        this.setMarkOffset(e, this.selectIndex);
-        this.canvas.redraw(this.markList, this.selectIndex);
+        _this.setMarkOffset(e, _this.selectIndex);
+        _this.canvas.redraw(_this.markList, _this.selectIndex);
 
-        // this.canvas.addEvent('mousemove', this.activeMoveHandler);
-        this.canvas.removeEvent('mousemove', this, 'selectMoveHandler');
-        this.canvas.removeEvent('ouseup', this, 'selectUpHandler');
-        this.cursorEvent = 'none';
+        // _this.canvas.addEvent('mousemove', _this.activeMoveHandler);
+        _this.canvas.removeEvent(_this, 'mousemove', 'selectmove', _this.selectMoveHandler);
+        _this.canvas.removeEvent(_this, 'mouseup', 'selectup', _this.selectUpHandler);
+        _this.cursorEvent = 'none';
     }
 
-    private scaleMoveHandler(e) {
+    private scaleMoveHandler(e, _this) {
         // selectIndex = _this.getSelectedMarkIndex();
-        this.resizeMark(e, this.selectIndex, this.action.direction);
-        this.canvas.redraw(this.markList, this.selectIndex);
+        _this.resizeMark(e, _this.selectIndex, _this.action.direction);
+        _this.canvas.redraw(_this.markList, _this.selectIndex);
     }
-    private scaleUpHandler(e) {
+
+    private scaleUpHandler(e, _this) {
         if (e.button !== 0) {
             return;
         }
-        this.canvas.redraw(this.markList, this.selectIndex);
-        this.canvas.addEvent('mousemove', this, 'scaleMoveHandler');
-        this.canvas.addEvent('mouseup', this, 'scaleUpHandler');
-        this.cursorEvent = 'none';
+        _this.canvas.redraw(_this.markList, _this.selectIndex);
+        _this.canvas.addEvent(_this, 'mousemove', 'scalemove', _this.scaleMoveHandler);
+        _this.canvas.addEvent(_this, 'mouseup', 'scaleup', _this.scaleUpHandler);
+        _this.cursorEvent = 'none';
     }
 
-    private activeMoveHandler(e) {
+    private activeMoveHandler(e, _this) {
         // selectIndex = _this.getSelectedMarkIndex();
-        this.setCursorStyle(e, this.selectIndex);
+        _this.setCursorStyle(e, _this.selectIndex);
     }
 
     private handleEvent() {
-        this.canvas.addEvent('mousedown', this, 'mouseDownHandler');
+        this.canvas.addEvent(this, 'mousedown', 'mousedown', this.mouseDownHandler);
     }
 
     // clear

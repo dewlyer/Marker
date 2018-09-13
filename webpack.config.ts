@@ -7,7 +7,7 @@ import * as ExtractTextPlugin from 'extract-text-webpack-plugin';
 const WebpackConfig: webpack.Configuration = {
     context: path.resolve(__dirname, './'),
     entry: {
-        main: './src/script/app.ts'
+        app: './src/script/app.ts'
     },
     output: {
         filename: '[name].bundle.js',
@@ -65,10 +65,15 @@ const WebpackConfig: webpack.Configuration = {
             title: 'Output Management',
             template: './src/app.html'
         }),
-        new ExtractTextPlugin('css/app.css'),
+        new ExtractTextPlugin({
+            filename: 'css/app.css',
+            allChunks: true
+        }),
         new webpack.ProvidePlugin({
             $: 'jquery',
-            jQuery: 'jquery'
+            jQuery: 'jquery',
+            _: 'lodash',
+            lodash: 'lodash'
         })
     ],
     devtool: 'source-map',
@@ -76,6 +81,10 @@ const WebpackConfig: webpack.Configuration = {
     //     contentBase: './dist'
     // },
     target: 'web',
+    // externals: {
+    //     jquery: 'jQuery',
+    //     lodash: 'lodash'
+    // },
     optimization: {
         splitChunks: {
             name: 'vendor'
