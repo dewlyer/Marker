@@ -8,18 +8,21 @@ import { EventHandler } from './Event';
 export class Marker {
     public static eventHandler = EventHandler;
     private static defaults = Defaults;
+
     private markList: MarkList;
     private canvas: MarkCanvas;
-    private origin: { x: number, y: number };
+    private settings: any;
+
     private zoom: number;
     private scaleZone: number;
-    private cursorEvent: string;
-    private settings: any;
+
     private selectedMark: Mark;
     private selectedOrigin: { x: number, y: number };
-
     private selectIndex: null;
+
     private action: any;
+    private origin: { x: number, y: number };
+    private cursorEvent: string;
 
     public constructor(canvas: HTMLCanvasElement, imageUrl: string, options?: any) {
         this.settings = $.extend(Marker.defaults, options || {});
