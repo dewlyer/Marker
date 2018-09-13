@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import * as $ from 'jquery';
 import { Mark } from './Mark';
 import { MarkList } from './MarkList';
@@ -9,7 +8,6 @@ import { EventHandler } from './Event';
 export class Marker {
     public static eventHandler = EventHandler;
     private static defaults = Defaults;
-
     private markList: MarkList;
     private canvas: MarkCanvas;
     private origin: { x: number, y: number };

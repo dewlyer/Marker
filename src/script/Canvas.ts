@@ -1,5 +1,5 @@
 import * as $ from 'jquery';
-import { MarkImage } from './Image';
+import { ImageSize, MarkImage } from './Image';
 import { MarkList } from './MarkList';
 import { Mark } from './Mark';
 
@@ -8,6 +8,7 @@ export class MarkCanvas {
     private scale: number;
     private style: any;
     private image: MarkImage;
+    private size: ImageSize;
 
     public constructor(private el: HTMLCanvasElement, url: string, style) {
         this.initialize(url, style);
@@ -19,6 +20,19 @@ export class MarkCanvas {
 
     public setScale(scale: number): void {
         this.scale = scale;
+    }
+
+    public setSize(size: ImageSize) {
+        this.size = size;
+    }
+
+    public setElSize() {
+        this.el.width = this.size.width * this.scale;
+        this.el.height = this.size.height * this.scale;
+    }
+
+    public setStyle(style) {
+        this.el.setAttribute('style', style);
     }
 
     public addEvent(scope, type, namespace, listener) {
@@ -33,21 +47,10 @@ export class MarkCanvas {
         $(this.el).off(type + '.' + namespace);
     }
 
-    public setSize(width, height) {
-        this.el.width = width * this.scale;
-        this.el.height = height * this.scale;
-    }
-
-    public setStyle(style) {
-        this.el.setAttribute('style', style);
-    }
-
     // draw
 
     public drawBackground(): void {
-        let {width, height} = this.image.getSize();
-        this.setSize(width, height);
-        this.ctx.drawImage(this.image.getElement(), 0, 0, width, height);
+        this.ctx.drawImage(this.image.getElement(), 0, 0, this.size.width, this.size.height);
     }
 
     public drawCreatingMark(current: Mark): void {
@@ -137,13 +140,16 @@ export class MarkCanvas {
     }
 
     public clear() {
-        this.ctx.clearRect(0, 0, this.el.width, this.el.height);
+        this.ctx.clearRect(0, 0, this.size.width, this.size.height);
     }
 
     public ready(callback) {
         let _this = this;
         this.image.loadComplete(() => {
             if (_this.image.hasSource()) {
+                let size = this.image.getSize();
+                this.setSize(size);
+                this.setElSize();
                 if (typeof callback === 'function') {
                     callback();
                 }
@@ -157,6 +163,7 @@ export class MarkCanvas {
         this.image = new MarkImage(url);
         this.ctx = this.el.getContext('2d');
         this.style = style;
+        this.size = {width: 0, height: 0};
         this.scale = 1;
     }
 }
