@@ -11,7 +11,8 @@ export class Marker {
     private markList: MarkList;
     private canvas: MarkCanvas;
     private origin: { x: number, y: number };
-    private scale: { size: number, zoom: number };
+    private zoom: number;
+    private scaleZone: number;
     private cursorEvent: string;
     private settings: any;
     private selectedMark: Mark;
@@ -77,9 +78,11 @@ export class Marker {
         }
     }
 
-    public setCanvasScale(zoom: number): void {
-        let scale = this.canvas.getScale();
-        scale *= zoom;
+    public setZoom(zoom: number): void {
+        let scale;
+        this.zoom = zoom;
+        scale = this.canvas.getScale();
+        scale *= this.zoom;
         this.canvas.setScale(scale);
         this.render();
     }
@@ -222,21 +225,21 @@ export class Marker {
         let ways = direction.split(',');
         ways.forEach(function (item) {
             if (item === 'left') {
-                if (offsetW <= 0 || _this.markList.list[itemIndex].width >= 2 * _this.scale.size) {
+                if (offsetW <= 0 || _this.markList.list[itemIndex].width >= 2 * _this.scaleZone) {
                     _this.markList.list[itemIndex].x = _this.selectedMark.x + offsetW;
                     _this.markList.list[itemIndex].width = _this.selectedMark.width - offsetW;
                 }
             } else if (item === 'right') {
-                if (offsetW >= 0 || _this.markList.list[itemIndex].width >= 2 * _this.scale.size) {
+                if (offsetW >= 0 || _this.markList.list[itemIndex].width >= 2 * _this.scaleZone) {
                     _this.markList.list[itemIndex].width = _this.selectedMark.width + offsetW;
                 }
             } else if (item === 'top') {
-                if (offsetH <= 0 || _this.markList.list[itemIndex].height > 2 * _this.scale.size) {
+                if (offsetH <= 0 || _this.markList.list[itemIndex].height > 2 * _this.scaleZone) {
                     _this.markList.list[itemIndex].y = _this.selectedMark.y + offsetH;
                     _this.markList.list[itemIndex].height = _this.selectedMark.height - offsetH;
                 }
             } else if (item === 'bottom') {
-                if (offsetH >= 0 || _this.markList.list[itemIndex].height >= 2 * _this.scale.size) {
+                if (offsetH >= 0 || _this.markList.list[itemIndex].height >= 2 * _this.scaleZone) {
                     _this.markList.list[itemIndex].height = _this.selectedMark.height + offsetH;
                 }
             }
@@ -257,25 +260,25 @@ export class Marker {
                     action.index = index;
                     action.name = 'scale';
                     if (index === itemIndex) {
-                        if (point.x <= x1 + _this.scale.size) {
-                            if (point.y <= y1 + _this.scale.size) {
+                        if (point.x <= x1 + _this.scaleZone) {
+                            if (point.y <= y1 + _this.scaleZone) {
                                 action.direction = 'left,top';
-                            } else if (point.y >= y2 - _this.scale.size) {
+                            } else if (point.y >= y2 - _this.scaleZone) {
                                 action.direction = 'left,bottom';
                             } else {
                                 action.direction = 'left';
                             }
-                        } else if (point.x >= x2 - _this.scale.size) {
-                            if (point.y <= y1 + _this.scale.size) {
+                        } else if (point.x >= x2 - _this.scaleZone) {
+                            if (point.y <= y1 + _this.scaleZone) {
                                 action.direction = 'right,top';
-                            } else if (point.y >= y2 - _this.scale.size) {
+                            } else if (point.y >= y2 - _this.scaleZone) {
                                 action.direction = 'right,bottom';
                             } else {
                                 action.direction = 'right';
                             }
-                        } else if (point.y <= y1 + _this.scale.size) {
+                        } else if (point.y <= y1 + _this.scaleZone) {
                             action.direction = 'top';
-                        } else if (point.y >= y2 - _this.scale.size) {
+                        } else if (point.y >= y2 - _this.scaleZone) {
                             action.direction = 'bottom';
                         } else {
                             action.name = 'move';
@@ -300,12 +303,11 @@ export class Marker {
         };
     }
 
-    private canAppendMark(event, success, failure) {
-        let _this = this;
-        let point = _this.getEventPosition(event);
-        let width = Math.abs(point.x - _this.origin.x);
-        let height = Math.abs(point.y - _this.origin.y);
-        if (width > 2 * _this.scale.size && height > 2 * _this.scale.size) {
+    private canCreateMark(event, success, failure) {
+        let point = this.getEventPosition(event);
+        let width = Math.abs(point.x - this.origin.x);
+        let height = Math.abs(point.y - this.origin.y);
+        if (width > 2 * this.scaleZone && height > 2 * this.scaleZone) {
             if (typeof success === 'function') {
                 success();
             }
@@ -334,25 +336,25 @@ export class Marker {
             y1 = item.y, y2 = item.y + item.height;
 
         if (point.x >= x1 && point.x <= x2 && point.y >= y1 && point.y <= y2) {
-            if (point.x <= x1 + _this.scale.size) {
-                if (point.y <= y1 + _this.scale.size) {
+            if (point.x <= x1 + _this.scaleZone) {
+                if (point.y <= y1 + _this.scaleZone) {
                     style = 'cursor: nw-resize;';
-                } else if (point.y >= y2 - _this.scale.size) {
+                } else if (point.y >= y2 - _this.scaleZone) {
                     style = 'cursor: sw-resize;';
                 } else {
                     style = 'cursor: w-resize;';
                 }
-            } else if (point.x >= x2 - _this.scale.size) {
-                if (point.y <= y1 + _this.scale.size) {
+            } else if (point.x >= x2 - _this.scaleZone) {
+                if (point.y <= y1 + _this.scaleZone) {
                     style = 'cursor: ne-resize;';
-                } else if (point.y >= y2 - _this.scale.size) {
+                } else if (point.y >= y2 - _this.scaleZone) {
                     style = 'cursor: se-resize;';
                 } else {
                     style = 'cursor: e-resize;';
                 }
-            } else if (point.y <= y1 + _this.scale.size) {
+            } else if (point.y <= y1 + _this.scaleZone) {
                 style = 'cursor: n-resize;';
-            } else if (point.y >= y2 - _this.scale.size) {
+            } else if (point.y >= y2 - _this.scaleZone) {
                 style = 'cursor: s-resize;';
             } else {
                 style = 'cursor: move;';
@@ -398,7 +400,8 @@ export class Marker {
     }
 
     private initialize(): void {
-        this.scale = {size: 10, zoom: 1};
+        this.scaleZone = 10;
+        this.zoom = 1;
         this.origin = {x: 0, y: 0};
         this.markList = new MarkList([]);
         this.selectedMark = null;

@@ -3,8 +3,7 @@ import '../style/app.scss';
 import { Marker as PaperMarker } from './Marker';
 
 window.addEventListener('load', (event: WindowEventMap['load']): any => {
-    // @ts-ignore
-    let canvas: HTMLCanvasElement = document.getElementById('canvas');
+    let canvas: HTMLCanvasElement = <HTMLCanvasElement> document.getElementById('canvas');
     let imageUrl = require('../images/bg.jpg');
     let paperMarker: PaperMarker;
     let events: object;
@@ -44,11 +43,11 @@ window.addEventListener('load', (event: WindowEventMap['load']): any => {
         },
         setRectScaleUp(e: HTMLElementEventMap['click']): void {
             console.log(e);
-            paperMarker.setCanvasScale(2);
+            paperMarker.setZoom(2);
         },
         setRectScaleDown(e: HTMLElementEventMap['click']): void {
             console.log(e);
-            paperMarker.setCanvasScale(0.5);
+            paperMarker.setZoom(0.5);
         },
         clearRectSelectKey(e: HTMLElementEventMap['keyup']): void {
             if (e.code === '8' || e.code === '46') {
