@@ -5,13 +5,12 @@ import { Mark } from './Mark';
 
 export class MarkCanvas {
     private ctx: CanvasRenderingContext2D;
-    private scale: number;
-    private style: any;
     private image: MarkImage;
     private size: ImageSize;
+    private scale: number;
 
-    public constructor(private el: HTMLCanvasElement, url: string, style) {
-        this.initialize(url, style);
+    public constructor(private el: HTMLCanvasElement, url: string, private style: any) {
+        this.initialize(url);
     }
 
     public getScale(): number {
@@ -159,10 +158,9 @@ export class MarkCanvas {
         });
     }
 
-    private initialize(url, style) {
+    private initialize(url) {
         this.image = new MarkImage(url);
         this.ctx = this.el.getContext('2d');
-        this.style = style;
         this.size = {width: 0, height: 0};
         this.scale = 1;
     }
