@@ -4,8 +4,10 @@ import { Mark } from './Mark';
 import { MarkList } from './MarkList';
 import { MarkCanvas } from './Canvas';
 import { Defaults } from './Defaults';
+import { EventHandler } from './Event';
 
 export class Marker {
+    public static eventHandler = EventHandler;
     private static defaults = Defaults;
 
     private markList: MarkList;
@@ -16,7 +18,6 @@ export class Marker {
     private settings: any;
     private selectedMark: Mark;
     private selectedOrigin: { x: number, y: number };
-
 
     private selectIndex: null;
     private action: any;
@@ -55,6 +56,7 @@ export class Marker {
             },
             text: {
                 font: this.settings.text.font,
+                bg: this.settings.text.color,
                 color: {
                     normal: this.settings.line.color.normal,
                     select: this.settings.line.color.select
@@ -81,13 +83,22 @@ export class Marker {
         let scale = this.canvas.getScale();
         scale *= zoom;
         this.canvas.setScale(scale);
+        this.render();
+    }
+
+    public render() {
         this.canvas.redraw(this.markList);
+    }
+
+    public renderCreating() {
+        let mark = this.getCurrent();
+        this.canvas.drawCreatingMark(mark);
     }
 
     public run(callback: () => void): void {
         let _this = this;
         this.canvas.ready(() => {
-            _this.canvas.drawBackground();
+            _this.render();
             _this.handleEvent();
             _this.initData();
             if (typeof callback === 'function') {
@@ -102,22 +113,22 @@ export class Marker {
         if (itemIndex !== null && this.cursorEvent === 'none') {
             id = this.markList.getItemById(itemIndex).id;
             this.clearMark(id);
-            this.canvas.removeEvent(this, 'mousemove', 'mousemove', this.mouseMoveHandler);
+            this.canvas.removeEvent(this, 'mousemove', 'mousemove');
         }
     }
 
     public clear() {
         if (this.cursorEvent === 'none') {
             this.clearMarkList();
-            this.canvas.redraw(this.markList);
+            this.render();
         }
     }
 
-    public getCurrentMark() {
+    public getCurrent() {
         return this.markList.current;
     }
 
-    public setCurrentMark(event: MouseEvent) {
+    public setCurrent(event: MouseEvent) {
         let point = this.getEventPosition(event);
         let [x, y, width, height, id] = [0, 0, 0, 0, this.markList.list.length.toString()];
 
@@ -281,11 +292,13 @@ export class Marker {
         return action;
     }
 
+
+
     private getEventPosition(event) {
-        let _this = this;
+        let scale = this.canvas.getScale();
         return {
-            x: (event.x + window.scrollX) / _this.scale.zoom,
-            y: (event.y + window.scrollY) / _this.scale.zoom
+            x: event.pageX / scale,
+            y: event.pageY / scale
         };
     }
 
@@ -353,105 +366,10 @@ export class Marker {
         _this.canvas.setStyle(style);
     }
 
+
     // events
-
-    private mouseDownHandler(e, _this) {
-        if (e.button !== 0) {
-            return;
-        }
-        _this.action = _this.getMouseAction(e);
-        if (_this.action.name === 'move') {
-            _this.cursorEvent = 'move';
-            _this.canvas.setStyle('cursor: move');
-            _this.setSelectedMark(_this.action.index);
-            _this.sortMarkList(_this.action.index);
-            _this.selectIndex = _this.getSelectedMarkIndex();
-            _this.canvas.redraw(_this.markList, _this.selectIndex);
-            _this.canvas.addEvent(_this, 'mousemove', 'selectmove', _this.selectMoveHandler);
-            _this.canvas.addEvent(_this, 'mouseup', 'selectup', _this.selectUpHandler);
-        } else if (_this.action.name === 'scale') {
-            _this.cursorEvent = 'scale';
-            _this.canvas.setStyle('cursor: move');
-            _this.setSelectedMark(_this.action.index);
-            _this.selectIndex = _this.getSelectedMarkIndex();
-            _this.canvas.addEvent(_this, 'ousemove', 'scalemove', _this.scaleMoveHandler);
-            _this.canvas.addEvent(_this, 'mouseup', 'scaleup', _this.scaleUpHandler);
-        } else {
-            // append rect
-            _this.cursorEvent = 'none';
-            _this.canvas.setStyle('cursor: default');
-            _this.setOriginPoint(e);
-            _this.clearSelectedMark();
-
-            _this.canvas.addEvent(_this, 'ousemove', 'mousemove', _this.mouseMoveHandler);
-            _this.canvas.addEvent(_this, 'mouseup', 'mouseup', _this.mouseUpHandler);
-        }
-    }
-
-    private mouseMoveHandler(e, _this) {
-        _this.setCurrentMark(e);
-        _this.canvas.redraw(_this.markList);
-        _this.canvas.drawCurrentMark(_this.getCurrentMark());
-    }
-
-    private mouseUpHandler(e, _this) {
-        if (e.button !== 0) {
-            return;
-        }
-        _this.canAppendMark(e, function () {
-            _this.setCurrentMark(e);
-            _this.addMark();
-        }, function () {
-            // alert('所选区域太小，请重现选取！');
-        });
-        _this.canvas.redraw(_this.markList);
-        _this.canvas.removeEvent(_this, 'mousemove', 'mousemove', _this.mouseMoveHandler);
-        _this.canvas.removeEvent(_this, 'mouseup', 'mouseup', _this.mouseUpHandler);
-    }
-
-    private selectMoveHandler(e, _this) {
-        // selectIndex = _this.getSelectedMarkIndex();
-        _this.setMarkOffset(e, _this.selectIndex);
-        _this.canvas.redraw(_this.markList, _this.selectIndex);
-    }
-
-    private selectUpHandler(e, _this) {
-        if (e.button !== 0) {
-            return;
-        }
-        // selectIndex = _this.getSelectedMarkIndex();
-        _this.setMarkOffset(e, _this.selectIndex);
-        _this.canvas.redraw(_this.markList, _this.selectIndex);
-
-        // _this.canvas.addEvent('mousemove', _this.activeMoveHandler);
-        _this.canvas.removeEvent(_this, 'mousemove', 'selectmove', _this.selectMoveHandler);
-        _this.canvas.removeEvent(_this, 'mouseup', 'selectup', _this.selectUpHandler);
-        _this.cursorEvent = 'none';
-    }
-
-    private scaleMoveHandler(e, _this) {
-        // selectIndex = _this.getSelectedMarkIndex();
-        _this.resizeMark(e, _this.selectIndex, _this.action.direction);
-        _this.canvas.redraw(_this.markList, _this.selectIndex);
-    }
-
-    private scaleUpHandler(e, _this) {
-        if (e.button !== 0) {
-            return;
-        }
-        _this.canvas.redraw(_this.markList, _this.selectIndex);
-        _this.canvas.addEvent(_this, 'mousemove', 'scalemove', _this.scaleMoveHandler);
-        _this.canvas.addEvent(_this, 'mouseup', 'scaleup', _this.scaleUpHandler);
-        _this.cursorEvent = 'none';
-    }
-
-    private activeMoveHandler(e, _this) {
-        // selectIndex = _this.getSelectedMarkIndex();
-        _this.setCursorStyle(e, _this.selectIndex);
-    }
-
     private handleEvent() {
-        this.canvas.addEvent(this, 'mousedown', 'mousedown', this.mouseDownHandler);
+        this.canvas.addEvent(this, 'mousedown', 'mousedown', Marker.eventHandler.mouseDown);
     }
 
     // clear
@@ -464,7 +382,7 @@ export class Marker {
         let index = this.getMarkIndexById(id);
         if (index !== null) {
             this.markList.list.splice(index, 1);
-            this.canvas.redraw(this.markList);
+            this.render();
         }
     }
 
@@ -477,7 +395,7 @@ export class Marker {
     private initData(): void {
         if (this.settings.data && this.settings.data.length > 0) {
             this.markList = this.settings.data;
-            this.canvas.redraw(this.markList);
+            this.render();
         }
     }
 

@@ -23,11 +23,13 @@ export class MarkCanvas {
 
     public addEvent(scope, type, namespace, listener) {
         $(this.el).on(type + '.' + namespace, (e) => {
-            listener(e, scope);
+            if (e.button === 0) {
+                listener(e, scope);
+            }
         });
     }
 
-    public removeEvent(scope, type, namespace, listener) {
+    public removeEvent(scope, type, namespace) {
         $(this.el).off(type + '.' + namespace);
     }
 
@@ -48,7 +50,7 @@ export class MarkCanvas {
         this.ctx.drawImage(this.image.getElement(), 0, 0, width, height);
     }
 
-    public drawCurrentMark(current: Mark): void {
+    public drawCreatingMark(current: Mark): void {
         this.ctx.save();
         this.ctx.strokeStyle = this.style.line.color.active;
         this.ctx.lineWidth = this.style.line.width.active;
@@ -116,7 +118,7 @@ export class MarkCanvas {
 
         this.ctx.save();
         this.ctx.font = this.style.text.font;
-        this.ctx.fillStyle = this.style.text.color.normal;
+        this.ctx.fillStyle = this.style.text.bg;
         this.ctx.fillRect(
             item.x * scale - 1,
             item.y * scale - 1,
