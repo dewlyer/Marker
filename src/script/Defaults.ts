@@ -22,6 +22,6 @@ export let Defaults = {
         color: 'rgba(255, 255, 255, 0.75)'
     },
     creatable: true,
-    draggable: false,
+    draggable: true,
     scalable: false
 };

@@ -5,26 +5,26 @@ export const EventHandler = {
         _this.action = _this.getMouseAction(event);
         let name = _this.action.name;
         let index = _this.action.index;
+        let id = _this.action.id;
         let canvas = _this.canvas;
         let settings = _this.settings;
         switch (name) {
             case 'move':
                 if (settings.draggable) {
                     _this.setEventType(name);
-                    _this.selectIndex = _this.getSelectedMarkIndex();
-                    _this.setSelectedMark(index);
-                    _this.sortMarkList(index);
+                    _this.setMarkSelectedById(id, event);
+                    // _this.sortMarkList(index);
+                    _this.renderList();
                     canvas.setStyle('cursor: move');
-                    canvas.redraw(_this.markList, _this.selectIndex);
-                    canvas.addEvent(_this, 'mousemove', 'selectmove', Marker.eventHandler.selectMove);
-                    canvas.addEvent(_this, 'mouseup', 'selectup', Marker.eventHandler.selectUp);
+                    canvas.addEvent(_this, 'mousemove', 'move', Marker.eventHandler.selectMove);
+                    canvas.addEvent(_this, 'mouseup', 'move', Marker.eventHandler.selectUp);
                 }
                 break;
             case 'scale':
                 if (settings.scalable) {
                     _this.setEventType(name);
                     _this.selectIndex = _this.getSelectedMarkIndex();
-                    _this.setSelectedMark(index);
+                    _this.setMarkSelectedByIndex(index);
                     canvas.setStyle('cursor: move');
                     canvas.addEvent(_this, 'mousemove', 'scalemove', Marker.eventHandler.scaleMove);
                     canvas.addEvent(_this, 'mouseup', 'scaleup', Marker.eventHandler.scaleUp);
@@ -34,7 +34,7 @@ export const EventHandler = {
                 if (settings.creatable) {
                     _this.setEventType('default');
                     _this.setEventOrigin(event);
-                    // _this.clearSelectedMark();
+                    _this.clearMarkSelected();
                     canvas.setStyle('cursor: default');
                     canvas.addEvent(_this, 'mousemove', 'create', Marker.eventHandler.mouseMove);
                     canvas.addEvent(_this, 'mouseup', 'create', Marker.eventHandler.mouseUp);
@@ -60,19 +60,16 @@ export const EventHandler = {
     },
 
     selectMove(event, _this) {
-        // selectIndex = _this.getSelectedMarkIndex();
-        _this.setMarkOffset(event, _this.selectIndex);
-        _this.canvas.redraw(_this.markList, _this.selectIndex);
+        _this.setSelectMarkOffset(event);
+        _this.renderList();
     },
     selectUp(event, _this) {
-        // selectIndex = _this.getSelectedMarkIndex();
-        _this.setMarkOffset(event, _this.selectIndex);
-        _this.canvas.redraw(_this.markList, _this.selectIndex);
-
+        // _this.setSelectMarkOffset(event);
+        // _this.renderList();
+        _this.setEventType('none');
         // _this.canvas.addEvent('mousemove', _this.activeMoveHandler);
-        _this.canvas.removeEvent(_this, 'mousemove', 'selectmove');
-        _this.canvas.removeEvent(_this, 'mouseup', 'selectup');
-        _this.eventType = 'none';
+        _this.canvas.removeEvent(_this, 'mousemove', 'move');
+        _this.canvas.removeEvent(_this, 'mouseup', 'move');
     },
 
     scaleMove(event, _this) {

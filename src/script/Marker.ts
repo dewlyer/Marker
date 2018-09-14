@@ -1,9 +1,9 @@
 import * as $ from 'jquery';
-import {Mark} from './Mark';
-import {MarkList} from './MarkList';
-import {MarkCanvas} from './Canvas';
-import {Defaults} from './Defaults';
-import {EventHandler} from './Event';
+import { Mark } from './Mark';
+import { MarkList } from './MarkList';
+import { MarkCanvas } from './Canvas';
+import { Defaults } from './Defaults';
+import { EventHandler } from './Event';
 
 export class Marker {
     public static eventHandler = EventHandler;
@@ -21,7 +21,7 @@ export class Marker {
     private selectIndex: null;
 
     private action: any;
-    private origin: { x: number, y: number };
+    private eventOrigin: { x: number, y: number };
     private eventType: string;
 
     public constructor(canvas: HTMLCanvasElement, imageUrl: string, options?: any) {
@@ -117,7 +117,7 @@ export class Marker {
 
     public setEventOrigin(event) {
         let _this = this;
-        _this.origin = _this.getEventPosition(event);
+        _this.eventOrigin = _this.getEventPosition(event);
     }
 
     public clearCurrentMark() {
@@ -145,20 +145,20 @@ export class Marker {
         let point = this.getEventPosition(event);
         let [x, y, width, height, id] = [0, 0, 0, 0, this.markList.list.length.toString()];
 
-        if (point.x >= this.origin.x) {
-            x = this.origin.x;
-            width = point.x - this.origin.x;
+        if (point.x >= this.eventOrigin.x) {
+            x = this.eventOrigin.x;
+            width = point.x - this.eventOrigin.x;
         } else {
             x = point.x;
-            width = this.origin.x - point.x;
+            width = this.eventOrigin.x - point.x;
         }
 
-        if (point.y >= this.origin.y) {
-            y = this.origin.y;
-            height = point.y - this.origin.y;
+        if (point.y >= this.eventOrigin.y) {
+            y = this.eventOrigin.y;
+            height = point.y - this.eventOrigin.y;
         } else {
             y = point.y;
-            height = this.origin.y - point.y;
+            height = this.eventOrigin.y - point.y;
         }
 
         this.markList.current = new Mark(id, x, y, width, height);
@@ -193,7 +193,18 @@ export class Marker {
         }
     }
 
-    private setSelectedMark(index) {
+    private setMarkSelectedById(id, event) {
+        let position = this.getEventPosition(event);
+        $.each(this.markList.list, function (index, item) {
+            if (id === item.id) {
+                item.select();
+                item.saveOrigin();
+                item.saveSelectPosition(position);
+            }
+        });
+    }
+
+    private setMarkSelectedByIndex(index) {
         let _this = this;
         let selectItem = _this.markList.list[index];
         _this.selectedOrigin = _this.getEventPosition(event);
@@ -205,6 +216,12 @@ export class Marker {
         //     x: selectItem.x,
         //     y: selectItem.y
         // };
+    }
+
+    private clearMarkSelected() {
+        $.each(this.markList.list, function (index, item) {
+            item.unselect();
+        });
     }
 
     private setMarkList(list) {
@@ -219,13 +236,14 @@ export class Marker {
         _this.markList.list.push(selectedMark);
     }
 
-    private setMarkOffset(event, itemIndex) {
-        let _this = this;
-        let position = _this.getEventPosition(event);
-        let offsetX = position.x - _this.selectedOrigin.x;
-        let offsetY = position.y - _this.selectedOrigin.y;
-        _this.markList.list[itemIndex].x = _this.selectedMark.x + offsetX;
-        _this.markList.list[itemIndex].y = _this.selectedMark.y + offsetY;
+    private setSelectMarkOffset(event) {
+        let position = this.getEventPosition(event);
+        $.each(this.markList.list, function (index, item) {
+            if (item.isSelected()) {
+                item.x = position.x + item.origin.x - item.selectPosition.x;
+                item.y = position.y + item.origin.y - item.selectPosition.y;
+            }
+        });
     }
 
     private resizeMark(event, itemIndex, direction) {
@@ -260,7 +278,7 @@ export class Marker {
 
     private getMouseAction(event) {
         let _this = this;
-        let action = {name: 'append', index: 0, direction: ''};
+        let action = {name: 'append', index: 0, id: '', direction: ''};
         let point = _this.getEventPosition(event);
         let itemIndex = _this.getSelectedMarkIndex();
 
@@ -270,6 +288,7 @@ export class Marker {
                     y1 = item.y, y2 = item.y + item.height;
                 if (point.x >= x1 && point.x <= x2 && point.y >= y1 && point.y <= y2) {
                     action.index = index;
+                    action.id = item.id;
                     action.name = 'scale';
                     if (index === itemIndex) {
                         if (point.x <= x1 + _this.scaleZone) {
@@ -316,8 +335,8 @@ export class Marker {
 
     private isMarkCreatable(event) {
         let point = this.getEventPosition(event);
-        let width = Math.abs(point.x - this.origin.x);
-        let height = Math.abs(point.y - this.origin.y);
+        let width = Math.abs(point.x - this.eventOrigin.x);
+        let height = Math.abs(point.y - this.eventOrigin.y);
         return width > 2 * this.scaleZone && height > 2 * this.scaleZone;
     }
 
@@ -389,10 +408,6 @@ export class Marker {
         }
     }
 
-    private clearSelectedMark() {
-        this.selectedMark = null;
-    }
-
     // init
 
     private initData(): void {
@@ -405,7 +420,7 @@ export class Marker {
     private initialize(): void {
         this.scaleZone = 10;
         this.zoom = 1;
-        this.origin = {x: 0, y: 0};
+        this.eventOrigin = {x: 0, y: 0};
         this.markList = new MarkList([]);
         this.selectedMark = null;
         this.eventType = 'none';

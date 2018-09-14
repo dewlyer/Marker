@@ -12,6 +12,10 @@ export interface MarkInterface {
 
 export class Mark implements MarkInterface {
     // private static penWidth = 1;
+    public origin: { x: number, y: number };
+    public selectPosition: { x: number, y: number };
+    private selected: boolean;
+
     public constructor(
         private readonly _id: string,
         private _x: number,
@@ -62,7 +66,31 @@ export class Mark implements MarkInterface {
         return this.width * this.height;
     }
 
+    public select() {
+        this.selected = true;
+    }
+
+    public unselect() {
+        this.selected = false;
+    }
+
+    public saveSelectPosition(position) {
+        this.selectPosition = position;
+    }
+
+    public saveOrigin() {
+        this.origin = {
+            x: this._x,
+            y: this._y
+        };
+    }
+
+    public isSelected() {
+        return this.selected;
+    }
+
     private initialize(): void {
+        this.selected = false;
         console.log('Class Mark Initialize Successfully', this.id);
     }
 }
