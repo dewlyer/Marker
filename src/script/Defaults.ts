@@ -1,4 +1,4 @@
-let Defaults = {
+export let Defaults = {
     container: document.documentElement,
     canvasWidth: 0,
     line: {
@@ -20,7 +20,8 @@ let Defaults = {
     text: {
         font: '14px Arial',
         color: 'rgba(255, 255, 255, 0.75)'
-    }
+    },
+    creatable: true,
+    draggable: false,
+    scalable: false
 };
-
-export { Defaults };

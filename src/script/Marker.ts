@@ -1,9 +1,9 @@
 import * as $ from 'jquery';
-import { Mark } from './Mark';
-import { MarkList } from './MarkList';
-import { MarkCanvas } from './Canvas';
-import { Defaults } from './Defaults';
-import { EventHandler } from './Event';
+import {Mark} from './Mark';
+import {MarkList} from './MarkList';
+import {MarkCanvas} from './Canvas';
+import {Defaults} from './Defaults';
+import {EventHandler} from './Event';
 
 export class Marker {
     public static eventHandler = EventHandler;
@@ -22,7 +22,7 @@ export class Marker {
 
     private action: any;
     private origin: { x: number, y: number };
-    private cursorEvent: string;
+    private eventType: string;
 
     public constructor(canvas: HTMLCanvasElement, imageUrl: string, options?: any) {
         this.settings = $.extend(Marker.defaults, options || {});
@@ -87,10 +87,10 @@ export class Marker {
         scale = this.canvas.getScale();
         scale *= this.zoom;
         this.canvas.setScale(scale);
-        this.render();
+        this.renderList();
     }
 
-    public render() {
+    public renderList() {
         this.canvas.redraw(this.markList);
     }
 
@@ -102,7 +102,7 @@ export class Marker {
     public run(callback: () => void): void {
         let _this = this;
         this.canvas.ready(() => {
-            _this.render();
+            _this.renderList();
             _this.handleEvent();
             _this.initData();
             if (typeof callback === 'function') {
@@ -111,20 +111,29 @@ export class Marker {
         });
     }
 
+    public setEventType(type) {
+        this.eventType = type;
+    }
+
+    public setEventOrigin(event) {
+        let _this = this;
+        _this.origin = _this.getEventPosition(event);
+    }
+
     public clearCurrentMark() {
         let itemIndex = this.getSelectedMarkIndex();
         let id;
-        if (itemIndex !== null && this.cursorEvent === 'none') {
+        if (itemIndex !== null && (this.eventType === 'none' || this.eventType === 'default')) {
             id = this.markList.getItemById(itemIndex).id;
             this.clearMark(id);
-            this.canvas.removeEvent(this, 'mousemove', 'mousemove');
+            this.removeEvent();
         }
     }
 
     public clear() {
-        if (this.cursorEvent === 'none') {
+        if (this.eventType === 'none' || this.eventType === 'default') {
             this.clearMarkList();
-            this.render();
+            this.renderList();
         }
     }
 
@@ -155,7 +164,7 @@ export class Marker {
         this.markList.current = new Mark(id, x, y, width, height);
     }
 
-    private addMark() {
+    private addCurrentToList() {
         let _this = this;
         _this.markList.list.push(_this.markList.current);
     }
@@ -297,7 +306,6 @@ export class Marker {
     }
 
 
-
     private getEventPosition(event) {
         let scale = this.canvas.getScale();
         return {
@@ -306,25 +314,13 @@ export class Marker {
         };
     }
 
-    private canCreateMark(event, success, failure) {
+    private isMarkCreatable(event) {
         let point = this.getEventPosition(event);
         let width = Math.abs(point.x - this.origin.x);
         let height = Math.abs(point.y - this.origin.y);
-        if (width > 2 * this.scaleZone && height > 2 * this.scaleZone) {
-            if (typeof success === 'function') {
-                success();
-            }
-        } else {
-            if (typeof failure === 'function') {
-                failure();
-            }
-        }
+        return width > 2 * this.scaleZone && height > 2 * this.scaleZone;
     }
 
-    private setOriginPoint(event) {
-        let _this = this;
-        _this.origin = _this.getEventPosition(event);
-    }
 
     private setCursorStyle(event, itemIndex) {
         let _this = this;
@@ -372,7 +368,11 @@ export class Marker {
 
     // events
     private handleEvent() {
-        this.canvas.addEvent(this, 'mousedown', 'mousedown', Marker.eventHandler.mouseDown);
+        this.canvas.addEvent(this, 'mousedown', 'start', Marker.eventHandler.mouseDown);
+    }
+
+    private removeEvent() {
+        this.canvas.removeEvent(this, 'mousemove', 'start');
     }
 
     // clear
@@ -385,7 +385,7 @@ export class Marker {
         let index = this.getMarkIndexById(id);
         if (index !== null) {
             this.markList.list.splice(index, 1);
-            this.render();
+            this.renderList();
         }
     }
 
@@ -398,7 +398,7 @@ export class Marker {
     private initData(): void {
         if (this.settings.data && this.settings.data.length > 0) {
             this.markList = this.settings.data;
-            this.render();
+            this.renderList();
         }
     }
 
@@ -408,5 +408,6 @@ export class Marker {
         this.origin = {x: 0, y: 0};
         this.markList = new MarkList([]);
         this.selectedMark = null;
+        this.eventType = 'none';
     }
 }
