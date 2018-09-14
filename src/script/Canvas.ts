@@ -66,13 +66,9 @@ export class MarkCanvas {
         this.ctx.restore();
     }
 
-    public drawMarkList(markList: MarkList, selectedIndex: number): void {
+    public drawMarkList(markList: MarkList): void {
         let _this = this;
         let selectIndex: number = null;
-
-        if (typeof selectedIndex !== 'undefined') {
-            // selectIndex = this.getSelectedMarkIndex();
-        }
 
         this.ctx.save();
         this.ctx.lineJoin = this.style.line.join.normal;
@@ -80,8 +76,8 @@ export class MarkCanvas {
         this.ctx.strokeStyle = this.style.line.color.normal;
         this.ctx.fillStyle = this.style.rect.color.normal;
 
-        markList.list.forEach(function (item, index) {
-            if (selectIndex === index) {
+        $.each(markList.list, (index, item) => {
+            if (item.isSelected()) {
                 _this.ctx.save();
                 _this.ctx.strokeStyle = _this.style.line.color.select;
                 _this.ctx.fillStyle = _this.style.rect.color.select;
@@ -103,16 +99,15 @@ export class MarkCanvas {
                 item.width * _this.scale,
                 item.height * _this.scale
             );
-            if (selectIndex === index) {
+            if (item.isSelected()) {
                 _this.ctx.restore();
             }
-            _this.drawCoordinate(item, index, selectedIndex, selectIndex);
+            _this.drawCoordinate(item, index);
         });
-
         _this.ctx.restore();
     }
 
-    public drawCoordinate(item: Mark, index: number, selected: number, selectIndex: number): void {
+    public drawCoordinate(item: Mark, index: number): void {
         let verOffset = 4;
         let horOffset = 4;
         let str = `ID: ${item.id} - X: ${item.x} - Y: ${item.y} - Z: ${index} - W: ${item.width} - H: ${item.height}`;
@@ -127,15 +122,15 @@ export class MarkCanvas {
             this.ctx.measureText(str).width + horOffset,
             -parseInt(this.style.text.font, 10) - verOffset
         );
-        this.ctx.fillStyle = (selected && selectIndex === index) ? this.style.text.color.select : this.style.text.color.normal;
+        this.ctx.fillStyle = item.isSelected() ? this.style.text.color.select : this.style.text.color.normal;
         this.ctx.fillText(str, item.x * scale, item.y * scale - verOffset);
         this.ctx.restore();
     }
 
-    public redraw(markList: MarkList, selectedIndex?: number): void {
+    public redraw(markList: MarkList): void {
         this.clear();
         this.drawBackground();
-        this.drawMarkList(markList, selectedIndex);
+        this.drawMarkList(markList);
     }
 
     public clear() {

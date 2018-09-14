@@ -12,6 +12,7 @@ export const EventHandler = {
             case 'move':
                 if (settings.draggable) {
                     _this.setEventType(name);
+                    _this.clearMarkSelected();
                     _this.setMarkSelectedById(id, event);
                     // _this.sortMarkList(index);
                     _this.renderList();
