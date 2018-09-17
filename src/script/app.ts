@@ -2,6 +2,8 @@
 import '../style/app.scss';
 import { Marker as PaperMarker } from './Marker';
 
+const AnswerList = 'ABCD';
+
 window.addEventListener('load', (event: WindowEventMap['load']): any => {
     let canvas: HTMLCanvasElement = <HTMLCanvasElement> document.getElementById('canvas');
     let imageUrl = canvas.dataset.img;
@@ -10,36 +12,46 @@ window.addEventListener('load', (event: WindowEventMap['load']): any => {
     let option = {
         data: [
             // 第一题
-            {x: 201, y: 595, width: 27, height: 16, checked: true},
-            {x: 233, y: 595, width: 27, height: 16},
-            {x: 265, y: 595, width: 27, height: 16},
-            {x: 297, y: 595, width: 27, height: 16},
+            {x: 201, y: 595, width: 27, height: 16, groupId: '001', checked: true},
+            {x: 233, y: 595, width: 27, height: 16, groupId: '001'},
+            {x: 265, y: 595, width: 27, height: 16, groupId: '001'},
+            {x: 297, y: 595, width: 27, height: 16, groupId: '001'},
             // 第二题
-            {x: 201, y: 616, width: 27, height: 16},
-            {x: 233, y: 616, width: 27, height: 16, checked: true},
-            {x: 265, y: 616, width: 27, height: 16},
-            {x: 297, y: 616, width: 27, height: 16},
+            {x: 201, y: 616, width: 27, height: 16, groupId: '002'},
+            {x: 233, y: 616, width: 27, height: 16, groupId: '002', checked: true},
+            {x: 265, y: 616, width: 27, height: 16, groupId: '002'},
+            {x: 297, y: 616, width: 27, height: 16, groupId: '002'},
             // 第三题
-            {x: 201, y: 637, width: 27, height: 16},
-            {x: 233, y: 637, width: 27, height: 16},
-            {x: 265, y: 637, width: 27, height: 16, checked: true},
-            {x: 297, y: 637, width: 27, height: 16},
+            {x: 201, y: 637, width: 27, height: 16, groupId: '003'},
+            {x: 233, y: 637, width: 27, height: 16, groupId: '003'},
+            {x: 265, y: 637, width: 27, height: 16, groupId: '003', checked: true},
+            {x: 297, y: 637, width: 27, height: 16, groupId: '003'},
             // 第四题
-            {x: 361, y: 595, width: 27, height: 16},
-            {x: 393, y: 595, width: 27, height: 16},
-            {x: 425, y: 595, width: 27, height: 16},
-            {x: 457, y: 595, width: 27, height: 16, checked: true},
+            {x: 361, y: 595, width: 27, height: 16, groupId: '004'},
+            {x: 393, y: 595, width: 27, height: 16, groupId: '004'},
+            {x: 425, y: 595, width: 27, height: 16, groupId: '004'},
+            {x: 457, y: 595, width: 27, height: 16, groupId: '004', checked: true},
             // 第五题
-            {x: 361, y: 616, width: 27, height: 16},
-            {x: 393, y: 616, width: 27, height: 16},
-            {x: 425, y: 616, width: 27, height: 16, checked: true},
-            {x: 457, y: 616, width: 27, height: 16},
+            {x: 361, y: 616, width: 27, height: 16, groupId: '005'},
+            {x: 393, y: 616, width: 27, height: 16, groupId: '005'},
+            {x: 425, y: 616, width: 27, height: 16, groupId: '005', checked: true},
+            {x: 457, y: 616, width: 27, height: 16, groupId: '005'},
             // 第六题
-            {x: 361, y: 637, width: 27, height: 16},
-            {x: 393, y: 637, width: 27, height: 16, checked: true},
-            {x: 425, y: 637, width: 27, height: 16},
-            {x: 457, y: 637, width: 27, height: 16}
-        ]
+            {x: 361, y: 637, width: 27, height: 16, groupId: '006'},
+            {x: 393, y: 637, width: 27, height: 16, groupId: '006', checked: true},
+            {x: 425, y: 637, width: 27, height: 16, groupId: '006'},
+            {x: 457, y: 637, width: 27, height: 16, groupId: '006'}
+        ],
+        afterCheck: function (groupId, index) {
+            let answer = AnswerList[index];
+            $('.answer-list')
+                .find('input').filter(function () {
+                    return $(this).data('group-id') === groupId;
+                })
+                .addClass('active')
+                .val(answer)
+                .parent().siblings().children('input').removeClass('active');
+        }
     };
 
     paperMarker = new PaperMarker(canvas, imageUrl, option);
@@ -99,6 +111,22 @@ window.addEventListener('load', (event: WindowEventMap['load']): any => {
                     document.getElementById(key).addEventListener('click', listener);
             }
         }
+
+        $('.answer-list').on('input', 'input', function () {
+            let $this = $(this);
+            let groupId = $this.data('group-id');
+            let str = $this.val().toString().toUpperCase();
+            let index = AnswerList.indexOf(str);
+            if (index !== -1) {
+                paperMarker.setGroupChecked(groupId, index);
+            } else {
+                window.alert('答案输入不正确，请重新输入！');
+            }
+            $this.val($this.val().toString().toUpperCase());
+        }).on('focus', 'input', function () {
+            let input = <HTMLInputElement> $(this).get(0);
+            input.select();
+        });
     });
 
     console.log(event);

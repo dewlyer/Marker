@@ -39,7 +39,7 @@
   },
   "scripts": {
     "webpack": "webpack --config webpack.config.ts",
-    "webpack:server": "webpack-dev-server --config webpack.config.ts --open",
+    "webpack:server": "webpack-dev-server --config webpack.config.ts --open --host 192.168.1.227",
     "tsc": "tsc -p tsconfig.json",
     "tsc:watch": "tsc -p tsconfig.json -w",
     "tslint": "tslint -p tsconfig.json -c tslint.json src/**/*.ts"

@@ -30,6 +30,52 @@ export class Marker {
         this.initialize();
     }
 
+    public setGroupChecked(groupId, groupIndex) {
+        let i = 0;
+        $.each(this.markList.list, function (index, item) {
+            if (item.getGroupId() === groupId) {
+                item.check(groupIndex === i);
+                i++;
+            }
+        });
+        this.renderList();
+    }
+
+    public setGroupCheckedByClick(id) {
+        let current = this.getMarkById(id);
+        let groupId = current.groupId;
+        let groupIndex = null;
+        let i = 0;
+        $.each(this.markList.list, function (index, item) {
+            if (item.getGroupId() === groupId) {
+                if (item.id === id) {
+                    groupIndex = i;
+                    item.check(true);
+                } else {
+                    item.check(false);
+                }
+                i++;
+            }
+        });
+        if (typeof this.settings.afterCheck === 'function') {
+            this.settings.afterCheck(groupId, groupIndex);
+        }
+    }
+
+    public getGroupChecked(groupId) {
+        let i = 0;
+        let checkList = [];
+        $.each(this.markList.list, function (index, item) {
+            if (item.getGroupId() === groupId) {
+                if (item.isChecked()) {
+                    checkList.push(i);
+                }
+                i++;
+            }
+        });
+        return checkList.join(',');
+    }
+
     public getMarkList() {
         let _this = this;
         return _this.markList.list;
@@ -131,6 +177,22 @@ export class Marker {
         _this.markList.list.push(_this.markList.current);
     }
 
+    private getMarkById(id) {
+        let _this = this,
+            mark = null;
+
+        _this.markList.list.every(function (item, i) {
+            if (item.id === id) {
+                mark = item;
+                return false;
+            } else {
+                return true;
+            }
+        });
+
+        return mark;
+    }
+
     private getMarkIndexById(id) {
         let _this = this,
             index = null;
@@ -190,12 +252,13 @@ export class Marker {
         let list: Mark[] = [];
         $.each(data, function (index, item) {
             let id = index.toString();
+            let groupId = item.groupId;
             let x = item.x;
             let y = item.y;
             let width = item.width;
             let height = item.height;
             let checked = item.checked;
-            list.push(new Mark(id, x, y, width, height, checked));
+            list.push(new Mark(id, x, y, width, height, groupId, checked));
         });
         this.markList.list = list;
     }

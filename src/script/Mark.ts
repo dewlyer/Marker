@@ -14,6 +14,7 @@ export class Mark implements MarkInterface {
     // private static penWidth = 1;
     public origin: { width: number, height: number, x: number, y: number };
     public selectPosition: { x: number, y: number };
+    private groupId: string;
     private selected: boolean;
     private checked: boolean;
 
@@ -23,8 +24,12 @@ export class Mark implements MarkInterface {
         private _y: number,
         private _width: number,
         private _height: number,
+        groupId?: string,
         checked?: boolean
     ) {
+        if (!!groupId) {
+            this.groupId = groupId;
+        }
         this.selected = false;
         this.checked = !!checked;
         this.initialize();
@@ -66,6 +71,13 @@ export class Mark implements MarkInterface {
         this._height = height;
     }
 
+    public getGroupId() {
+        return this.groupId;
+    }
+
+    public setGroupId(groupId) {
+        this.groupId = groupId;
+    }
     public calculateArea(): number {
         return this.width * this.height;
     }

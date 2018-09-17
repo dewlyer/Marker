@@ -15,6 +15,7 @@ export const EventHandler = {
                     _this.clearMarkSelected();
                     canvas.removeEvent(_this, 'mousemove', 'active');
                     _this.setMarkSelectedById(id, event);
+                    _this.setGroupCheckedByClick(id);
                     // _this.sortMarkList(index);
                     _this.renderList();
                     canvas.setStyle('cursor: move');
