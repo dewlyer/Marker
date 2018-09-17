@@ -4,11 +4,45 @@ import { Marker as PaperMarker } from './Marker';
 
 window.addEventListener('load', (event: WindowEventMap['load']): any => {
     let canvas: HTMLCanvasElement = <HTMLCanvasElement> document.getElementById('canvas');
-    let imageUrl = require('../images/bg.jpg');
+    let imageUrl = canvas.dataset.img;
     let paperMarker: PaperMarker;
     let events: object;
+    let option = {
+        data: [
+            // 第一题
+            {x: 201, y: 595, width: 27, height: 16, checked: true},
+            {x: 233, y: 595, width: 27, height: 16},
+            {x: 265, y: 595, width: 27, height: 16},
+            {x: 297, y: 595, width: 27, height: 16},
+            // 第二题
+            {x: 201, y: 616, width: 27, height: 16},
+            {x: 233, y: 616, width: 27, height: 16, checked: true},
+            {x: 265, y: 616, width: 27, height: 16},
+            {x: 297, y: 616, width: 27, height: 16},
+            // 第三题
+            {x: 201, y: 637, width: 27, height: 16},
+            {x: 233, y: 637, width: 27, height: 16},
+            {x: 265, y: 637, width: 27, height: 16, checked: true},
+            {x: 297, y: 637, width: 27, height: 16},
+            // 第四题
+            {x: 361, y: 595, width: 27, height: 16},
+            {x: 393, y: 595, width: 27, height: 16},
+            {x: 425, y: 595, width: 27, height: 16},
+            {x: 457, y: 595, width: 27, height: 16, checked: true},
+            // 第五题
+            {x: 361, y: 616, width: 27, height: 16},
+            {x: 393, y: 616, width: 27, height: 16},
+            {x: 425, y: 616, width: 27, height: 16, checked: true},
+            {x: 457, y: 616, width: 27, height: 16},
+            // 第六题
+            {x: 361, y: 637, width: 27, height: 16},
+            {x: 393, y: 637, width: 27, height: 16, checked: true},
+            {x: 425, y: 637, width: 27, height: 16},
+            {x: 457, y: 637, width: 27, height: 16}
+        ]
+    };
 
-    paperMarker = new PaperMarker(canvas, imageUrl);
+    paperMarker = new PaperMarker(canvas, imageUrl, option);
 
     events = {
         clearRectList(e: HTMLElementEventMap['click']): void {

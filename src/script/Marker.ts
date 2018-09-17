@@ -26,45 +26,7 @@ export class Marker {
 
     public constructor(canvas: HTMLCanvasElement, imageUrl: string, options?: any) {
         this.settings = $.extend(Marker.defaults, options || {});
-        this.canvas = new MarkCanvas(canvas, imageUrl, {
-            line: {
-                join: {
-                    normal: this.settings.line.join,
-                    active: this.settings.line.join,
-                    select: this.settings.line.join
-                },
-                dash: {
-                    normal: this.settings.line.dash,
-                    active: this.settings.line.dash,
-                    select: this.settings.line.dash
-                },
-                width: {
-                    normal: this.settings.line.width,
-                    active: this.settings.line.width,
-                    select: this.settings.line.width
-                },
-                color: {
-                    normal: this.settings.line.color.normal,
-                    active: this.settings.line.color.active,
-                    select: this.settings.line.color.select
-                }
-            },
-            rect: {
-                color: {
-                    normal: this.settings.rect.color.normal,
-                    active: this.settings.rect.color.active,
-                    select: this.settings.rect.color.select
-                }
-            },
-            text: {
-                font: this.settings.text.font,
-                bg: this.settings.text.color,
-                color: {
-                    normal: this.settings.line.color.normal,
-                    select: this.settings.line.color.select
-                }
-            }
-        });
+        this.canvas = new MarkCanvas(canvas, imageUrl, this.settings.style);
         this.initialize();
     }
 
@@ -224,9 +186,18 @@ export class Marker {
         });
     }
 
-    private setMarkList(list) {
-        let _this = this;
-        _this.markList.list = list;
+    private setMarkListByData(data) {
+        let list: Mark[] = [];
+        $.each(data, function (index, item) {
+            let id = index.toString();
+            let x = item.x;
+            let y = item.y;
+            let width = item.width;
+            let height = item.height;
+            let checked = item.checked;
+            list.push(new Mark(id, x, y, width, height, checked));
+        });
+        this.markList.list = list;
     }
 
     private sortMarkList(index) {
@@ -293,28 +264,32 @@ export class Marker {
             if (point.x >= x1 && point.x <= x2 && point.y >= y1 && point.y <= y2) {
                 action.id = item.id;
                 action.index = index;
-                action.name = 'scale';
                 if (item.isSelected()) {
-                    if (point.x <= x1 + _this.scaleZone) {
-                        if (point.y <= y1 + _this.scaleZone) {
-                            action.direction = 'left,top';
+                    if (_this.settings.scalable) {
+                        action.name = 'scale';
+                        if (point.x <= x1 + _this.scaleZone) {
+                            if (point.y <= y1 + _this.scaleZone) {
+                                action.direction = 'left,top';
+                            } else if (point.y >= y2 - _this.scaleZone) {
+                                action.direction = 'left,bottom';
+                            } else {
+                                action.direction = 'left';
+                            }
+                        } else if (point.x >= x2 - _this.scaleZone) {
+                            if (point.y <= y1 + _this.scaleZone) {
+                                action.direction = 'right,top';
+                            } else if (point.y >= y2 - _this.scaleZone) {
+                                action.direction = 'right,bottom';
+                            } else {
+                                action.direction = 'right';
+                            }
+                        } else if (point.y <= y1 + _this.scaleZone) {
+                            action.direction = 'top';
                         } else if (point.y >= y2 - _this.scaleZone) {
-                            action.direction = 'left,bottom';
+                            action.direction = 'bottom';
                         } else {
-                            action.direction = 'left';
+                            action.name = 'move';
                         }
-                    } else if (point.x >= x2 - _this.scaleZone) {
-                        if (point.y <= y1 + _this.scaleZone) {
-                            action.direction = 'right,top';
-                        } else if (point.y >= y2 - _this.scaleZone) {
-                            action.direction = 'right,bottom';
-                        } else {
-                            action.direction = 'right';
-                        }
-                    } else if (point.y <= y1 + _this.scaleZone) {
-                        action.direction = 'top';
-                    } else if (point.y >= y2 - _this.scaleZone) {
-                        action.direction = 'bottom';
                     } else {
                         action.name = 'move';
                     }
@@ -422,7 +397,7 @@ export class Marker {
 
     private initData(): void {
         if (this.settings.data && this.settings.data.length > 0) {
-            this.markList = this.settings.data;
+            this.setMarkListByData(this.settings.data);
             this.renderList();
         }
     }

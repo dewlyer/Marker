@@ -15,14 +15,18 @@ export class Mark implements MarkInterface {
     public origin: { width: number, height: number, x: number, y: number };
     public selectPosition: { x: number, y: number };
     private selected: boolean;
+    private checked: boolean;
 
     public constructor(
         private readonly _id: string,
         private _x: number,
         private _y: number,
         private _width: number,
-        private _height: number
+        private _height: number,
+        checked?: boolean
     ) {
+        this.selected = false;
+        this.checked = !!checked;
         this.initialize();
     }
 
@@ -74,6 +78,18 @@ export class Mark implements MarkInterface {
         this.selected = false;
     }
 
+    public isSelected() {
+        return this.selected;
+    }
+
+    public check(check: boolean) {
+        this.checked = check;
+    }
+
+    public isChecked() {
+        return this.checked;
+    }
+
     public saveSelectPosition(position) {
         this.selectPosition = position;
     }
@@ -87,12 +103,7 @@ export class Mark implements MarkInterface {
         };
     }
 
-    public isSelected() {
-        return this.selected;
-    }
-
     private initialize(): void {
-        this.selected = false;
         console.log('Class Mark Initialize Successfully', this.id);
     }
 }

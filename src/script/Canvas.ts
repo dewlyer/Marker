@@ -86,6 +86,15 @@ export class MarkCanvas {
                 _this.ctx.shadowOffsetX = 0;
                 _this.ctx.shadowOffsetY = 2;
                 _this.ctx.shadowBlur = 3;
+            } else if (item.isChecked()) {
+                _this.ctx.save();
+                _this.ctx.strokeStyle = _this.style.line.color.check;
+                _this.ctx.fillStyle = _this.style.rect.color.check;
+                _this.ctx.lineWidth = _this.style.line.width.check;
+                _this.ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                _this.ctx.shadowOffsetX = 0;
+                _this.ctx.shadowOffsetY = 2;
+                _this.ctx.shadowBlur = 3;
             }
             _this.ctx.fillRect(
                 item.x * _this.scale,
@@ -99,10 +108,10 @@ export class MarkCanvas {
                 item.width * _this.scale,
                 item.height * _this.scale
             );
-            if (item.isSelected()) {
+            if (item.isSelected() || item.isChecked()) {
                 _this.ctx.restore();
             }
-            _this.drawCoordinate(item, index);
+            // _this.drawCoordinate(item, index);
         });
         _this.ctx.restore();
     }
