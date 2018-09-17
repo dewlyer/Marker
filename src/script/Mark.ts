@@ -12,7 +12,7 @@ export interface MarkInterface {
 
 export class Mark implements MarkInterface {
     // private static penWidth = 1;
-    public origin: { x: number, y: number };
+    public origin: { width: number, height: number, x: number, y: number };
     public selectPosition: { x: number, y: number };
     private selected: boolean;
 
@@ -80,6 +80,8 @@ export class Mark implements MarkInterface {
 
     public saveOrigin() {
         this.origin = {
+            width: this.width,
+            height: this.height,
             x: this._x,
             y: this._y
         };

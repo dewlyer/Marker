@@ -23,5 +23,5 @@ export let Defaults = {
     },
     creatable: true,
     draggable: true,
-    scalable: false
+    scalable: true
 };

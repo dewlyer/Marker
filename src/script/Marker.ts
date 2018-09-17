@@ -246,32 +246,37 @@ export class Marker {
         });
     }
 
-    private resizeMark(event, itemIndex, direction) {
+    private resizeSelectMark(event, direction) {
         let _this = this;
         let point = _this.getEventPosition(event);
-        let offsetW = point.x - _this.selectedOrigin.x;
-        let offsetH = point.y - _this.selectedOrigin.y;
-
         let ways = direction.split(',');
-        ways.forEach(function (item) {
-            if (item === 'left') {
-                if (offsetW <= 0 || _this.markList.list[itemIndex].width >= 2 * _this.scaleZone) {
-                    _this.markList.list[itemIndex].x = _this.selectedMark.x + offsetW;
-                    _this.markList.list[itemIndex].width = _this.selectedMark.width - offsetW;
-                }
-            } else if (item === 'right') {
-                if (offsetW >= 0 || _this.markList.list[itemIndex].width >= 2 * _this.scaleZone) {
-                    _this.markList.list[itemIndex].width = _this.selectedMark.width + offsetW;
-                }
-            } else if (item === 'top') {
-                if (offsetH <= 0 || _this.markList.list[itemIndex].height > 2 * _this.scaleZone) {
-                    _this.markList.list[itemIndex].y = _this.selectedMark.y + offsetH;
-                    _this.markList.list[itemIndex].height = _this.selectedMark.height - offsetH;
-                }
-            } else if (item === 'bottom') {
-                if (offsetH >= 0 || _this.markList.list[itemIndex].height >= 2 * _this.scaleZone) {
-                    _this.markList.list[itemIndex].height = _this.selectedMark.height + offsetH;
-                }
+
+        $.each(this.markList.list, function (index, item) {
+            let offsetW, offsetH;
+            if (item.isSelected()) {
+                offsetW = point.x - item.selectPosition.x;
+                offsetH = point.y - item.selectPosition.y;
+                $.each(ways, function (i, way) {
+                    if (way === 'left') {
+                        if (offsetW <= 0 || item.width >= 2 * _this.scaleZone) {
+                            item.x = item.origin.x + offsetW;
+                            item.width = item.origin.width - offsetW;
+                        }
+                    } else if (way === 'right') {
+                        if (offsetW >= 0 || item.width >= 2 * _this.scaleZone) {
+                            item.width = item.origin.width + offsetW;
+                        }
+                    } else if (way === 'top') {
+                        if (offsetH <= 0 || item.height > 2 * _this.scaleZone) {
+                            item.y = item.origin.y + offsetH;
+                            item.height = item.origin.height - offsetH;
+                        }
+                    } else if (way === 'bottom') {
+                        if (offsetH >= 0 || item.height >= 2 * _this.scaleZone) {
+                            item.height = item.origin.height + offsetH;
+                        }
+                    }
+                });
             }
         });
     }
@@ -280,46 +285,49 @@ export class Marker {
         let _this = this;
         let action = {name: 'append', index: 0, id: '', direction: ''};
         let point = _this.getEventPosition(event);
-        let itemIndex = _this.getSelectedMarkIndex();
+        // let itemIndex = _this.getSelectedMarkIndex();
 
-        if (_this.markList.list.length > 0) {
-            _this.markList.list.forEach(function (item, index) {
-                let x1 = item.x, x2 = item.x + item.width,
-                    y1 = item.y, y2 = item.y + item.height;
-                if (point.x >= x1 && point.x <= x2 && point.y >= y1 && point.y <= y2) {
-                    action.index = index;
-                    action.id = item.id;
-                    action.name = 'scale';
-                    if (index === itemIndex) {
-                        if (point.x <= x1 + _this.scaleZone) {
-                            if (point.y <= y1 + _this.scaleZone) {
-                                action.direction = 'left,top';
-                            } else if (point.y >= y2 - _this.scaleZone) {
-                                action.direction = 'left,bottom';
-                            } else {
-                                action.direction = 'left';
-                            }
-                        } else if (point.x >= x2 - _this.scaleZone) {
-                            if (point.y <= y1 + _this.scaleZone) {
-                                action.direction = 'right,top';
-                            } else if (point.y >= y2 - _this.scaleZone) {
-                                action.direction = 'right,bottom';
-                            } else {
-                                action.direction = 'right';
-                            }
-                        } else if (point.y <= y1 + _this.scaleZone) {
-                            action.direction = 'top';
+        $.each(this.markList.list, function (index, item) {
+            let x1 = item.x, x2 = item.x + item.width,
+                y1 = item.y, y2 = item.y + item.height;
+            if (point.x >= x1 && point.x <= x2 && point.y >= y1 && point.y <= y2) {
+                action.id = item.id;
+                action.index = index;
+                action.name = 'scale';
+                if (item.isSelected()) {
+                    if (point.x <= x1 + _this.scaleZone) {
+                        if (point.y <= y1 + _this.scaleZone) {
+                            action.direction = 'left,top';
                         } else if (point.y >= y2 - _this.scaleZone) {
-                            action.direction = 'bottom';
+                            action.direction = 'left,bottom';
                         } else {
-                            action.name = 'move';
+                            action.direction = 'left';
                         }
+                    } else if (point.x >= x2 - _this.scaleZone) {
+                        if (point.y <= y1 + _this.scaleZone) {
+                            action.direction = 'right,top';
+                        } else if (point.y >= y2 - _this.scaleZone) {
+                            action.direction = 'right,bottom';
+                        } else {
+                            action.direction = 'right';
+                        }
+                    } else if (point.y <= y1 + _this.scaleZone) {
+                        action.direction = 'top';
+                    } else if (point.y >= y2 - _this.scaleZone) {
+                        action.direction = 'bottom';
                     } else {
                         action.name = 'move';
                     }
+                } else {
+                    action.name = 'move';
                 }
-            });
-        }
+            }
+        });
+
+        // if (_this.markList.list.length > 0) {
+        //     _this.markList.list.forEach(function (item, index) {
+        //     });
+        // }
 
         return action;
     }
@@ -341,47 +349,49 @@ export class Marker {
     }
 
 
-    private setCursorStyle(event, itemIndex) {
+    private setCursorStyle(event) {
         let _this = this;
-        if (_this.markList.list.length <= 0) {
+        if (this.markList.list.length <= 0) {
             return;
         }
 
-        let point = _this.getEventPosition(event);
-        let item = _this.markList.list[itemIndex];
-        let style = 'cursor: move;';
-        let x1 = item.x, x2 = item.x + item.width,
-            y1 = item.y, y2 = item.y + item.height;
+        let point = this.getEventPosition(event);
+        // let item = this.markList.list[itemIndex];
+        $.each(this.markList.list, function (index, item) {
+            let style = 'cursor: move;';
+            let x1 = item.x, x2 = item.x + item.width,
+                y1 = item.y, y2 = item.y + item.height;
 
-        if (point.x >= x1 && point.x <= x2 && point.y >= y1 && point.y <= y2) {
-            if (point.x <= x1 + _this.scaleZone) {
-                if (point.y <= y1 + _this.scaleZone) {
-                    style = 'cursor: nw-resize;';
+            if (point.x >= x1 && point.x <= x2 && point.y >= y1 && point.y <= y2) {
+                if (point.x <= x1 + _this.scaleZone) {
+                    if (point.y <= y1 + _this.scaleZone) {
+                        style = 'cursor: nw-resize;';
+                    } else if (point.y >= y2 - _this.scaleZone) {
+                        style = 'cursor: sw-resize;';
+                    } else {
+                        style = 'cursor: w-resize;';
+                    }
+                } else if (point.x >= x2 - _this.scaleZone) {
+                    if (point.y <= y1 + _this.scaleZone) {
+                        style = 'cursor: ne-resize;';
+                    } else if (point.y >= y2 - _this.scaleZone) {
+                        style = 'cursor: se-resize;';
+                    } else {
+                        style = 'cursor: e-resize;';
+                    }
+                } else if (point.y <= y1 + _this.scaleZone) {
+                    style = 'cursor: n-resize;';
                 } else if (point.y >= y2 - _this.scaleZone) {
-                    style = 'cursor: sw-resize;';
+                    style = 'cursor: s-resize;';
                 } else {
-                    style = 'cursor: w-resize;';
+                    style = 'cursor: move;';
                 }
-            } else if (point.x >= x2 - _this.scaleZone) {
-                if (point.y <= y1 + _this.scaleZone) {
-                    style = 'cursor: ne-resize;';
-                } else if (point.y >= y2 - _this.scaleZone) {
-                    style = 'cursor: se-resize;';
-                } else {
-                    style = 'cursor: e-resize;';
-                }
-            } else if (point.y <= y1 + _this.scaleZone) {
-                style = 'cursor: n-resize;';
-            } else if (point.y >= y2 - _this.scaleZone) {
-                style = 'cursor: s-resize;';
             } else {
-                style = 'cursor: move;';
+                style = 'cursor: default;';
             }
-        } else {
-            style = 'cursor: default;';
-        }
 
-        _this.canvas.setStyle(style);
+            _this.canvas.setStyle(style);
+        });
     }
 
 
