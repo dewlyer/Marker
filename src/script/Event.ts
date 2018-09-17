@@ -3,12 +3,11 @@ import { Marker } from './Marker';
 export const EventHandler = {
     mouseDown(event, _this) {
         _this.action = _this.getMouseAction(event);
+        // let index = _this.action.index;
         let name = _this.action.name;
-        let index = _this.action.index;
         let id = _this.action.id;
         let canvas = _this.canvas;
         let settings = _this.settings;
-        console.log(name)
         switch (name) {
             case 'move':
                 if (settings.draggable) {
@@ -45,7 +44,6 @@ export const EventHandler = {
                 }
         }
     },
-
     mouseMove(event, _this) {
         _this.setCurrent(event);
         _this.renderList();
@@ -62,7 +60,6 @@ export const EventHandler = {
         _this.canvas.removeEvent(_this, 'mousemove', 'create');
         _this.canvas.removeEvent(_this, 'mouseup', 'create');
     },
-
     selectMove(event, _this) {
         _this.setSelectMarkOffset(event);
         _this.renderList();
@@ -76,7 +73,6 @@ export const EventHandler = {
 
         _this.canvas.addEvent(_this, 'mousemove', 'active', Marker.eventHandler.activeMove);
     },
-
     scaleMove(event, _this) {
         _this.resizeSelectMark(event, _this.action.direction);
         _this.renderList();
@@ -86,7 +82,6 @@ export const EventHandler = {
         _this.canvas.removeEvent(_this, 'mousemove', 'scalemove');
         _this.canvas.removeEvent(_this, 'mouseup', 'scaleup');
     },
-
     activeMove(event, _this) {
         _this.setCursorStyle(event);
     }
