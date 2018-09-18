@@ -118,14 +118,23 @@ window.addEventListener('load', (event: WindowEventMap['load']): any => {
             let str = $this.val().toString().toUpperCase();
             let index = AnswerList.indexOf(str);
             if (index !== -1) {
+                paperMarker.clearMarkSelected();
                 paperMarker.setGroupChecked(groupId, index);
+                paperMarker.setGroupSelectedByCheck(groupId);
             } else {
                 window.alert('答案输入不正确，请重新输入！');
             }
             $this.val($this.val().toString().toUpperCase());
         }).on('focus', 'input', function () {
-            let input = <HTMLInputElement> $(this).get(0);
+            let $this = $(this);
+            let input = <HTMLInputElement> $this.get(0);
+            let groupId = $this.data('group-id');
+            paperMarker.clearMarkSelected();
+            paperMarker.setGroupSelectedByCheck(groupId);
             input.select();
+
+            $this.addClass('active')
+                .parent().siblings().children('input').removeClass('active');
         });
     });
 

@@ -30,12 +30,43 @@ export class Marker {
         this.initialize();
     }
 
+    public clearMarkSelected() {
+        $.each(this.markList.list, function (index, item) {
+            item.unselect();
+        });
+    }
+
+    public setMarkChecked(item, checked) {
+        item.check(checked);
+    }
+
+    public setMarkCheckedById(id) {
+    }
+
+    public setMarkCheckedByIndex(index, checked) {
+        this.markList.list[index].check(checked);
+    }
+
     public setGroupChecked(groupId, groupIndex) {
+        let _this = this;
         let i = 0;
         $.each(this.markList.list, function (index, item) {
+            let checked;
             if (item.getGroupId() === groupId) {
-                item.check(groupIndex === i);
+                checked = groupIndex === i;
+                // _this.setMarkChecked(item, groupIndex === i);
+                _this.setMarkCheckedByIndex(index, checked);
                 i++;
+            }
+        });
+        this.renderList();
+    }
+
+    public setGroupSelectedByCheck(groupId) {
+        let _this = this;
+        $.each(this.markList.list, function (index, item) {
+            if (item.getGroupId() === groupId && item.isChecked()) {
+                _this.setMarkSelectedByIndex(index);
             }
         });
         this.renderList();
@@ -229,10 +260,8 @@ export class Marker {
     }
 
     private setMarkSelectedByIndex(index) {
-        let _this = this;
-        let selectItem = _this.markList.list[index];
-        _this.selectedOrigin = _this.getEventPosition(event);
-        _this.selectedMark = selectItem;
+        let selectItem = this.markList.list[index];
+        selectItem.select();
         // {
         //     id: selectItem.id,
         //     width: selectItem.width,
@@ -240,12 +269,6 @@ export class Marker {
         //     x: selectItem.x,
         //     y: selectItem.y
         // };
-    }
-
-    private clearMarkSelected() {
-        $.each(this.markList.list, function (index, item) {
-            item.unselect();
-        });
     }
 
     private setMarkListByData(data) {
