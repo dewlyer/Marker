@@ -137,6 +137,4 @@ window.addEventListener('load', (event: WindowEventMap['load']): any => {
                 .parent().siblings().children('input').removeClass('active');
         });
     });
-
-    console.log(event);
 });

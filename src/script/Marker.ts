@@ -3,10 +3,8 @@ import { Mark } from './Mark';
 import { MarkList } from './MarkList';
 import { MarkCanvas } from './Canvas';
 import { Defaults } from './Defaults';
-import { EventHandler } from './Event';
 
 export class Marker {
-    public static eventHandler = EventHandler;
     private static defaults = Defaults;
 
     private markList: MarkList;
@@ -23,6 +21,15 @@ export class Marker {
     private action: any;
     private eventOrigin: { x: number, y: number };
     private eventType: string;
+
+    private mouseDown: Function;
+    private mouseMove: Function;
+    private mouseUp: Function;
+    private selectMove: Function;
+    private selectUp: Function;
+    private scaleMove: Function;
+    private scaleUp: Function;
+    private activeMove: Function;
 
     public constructor(canvas: HTMLCanvasElement, imageUrl: string, options?: any) {
         this.settings = $.extend(Marker.defaults, options || {});
@@ -455,10 +462,11 @@ export class Marker {
         });
     }
 
-
     // events
+
+
     private handleEvent() {
-        this.canvas.addEvent(this, 'mousedown', 'start', Marker.eventHandler.mouseDown);
+        this.canvas.addEvent(this, 'mousedown', 'start', this.mouseDown);
     }
 
     private removeEvent() {
@@ -488,6 +496,95 @@ export class Marker {
         }
     }
 
+    private initEvents(): void {
+        let _this = this;
+        this.mouseDown = (event) => {
+            _this.action = _this.getMouseAction(event);
+            // let index = _this.action.index;
+            let name = _this.action.name;
+            let id = _this.action.id;
+            let canvas = _this.canvas;
+            let settings = _this.settings;
+            switch (name) {
+                case 'move':
+                    if (settings.draggable) {
+                        _this.setEventType(name);
+                        _this.clearMarkSelected();
+                        canvas.removeEvent(_this, 'mousemove', 'active');
+                        _this.setMarkSelectedById(id, event);
+                        _this.setGroupCheckedByClick(id);
+                        // _this.sortMarkList(index);
+                        _this.renderList();
+                        canvas.setStyle('cursor: move');
+                        canvas.addEvent(_this, 'mousemove', 'move', _this.selectMove);
+                        canvas.addEvent(_this, 'mouseup', 'move', _this.selectUp);
+                    }
+                    break;
+                case 'scale':
+                    if (settings.scalable) {
+                        _this.setEventType(name);
+                        _this.setMarkSelectedById(id, event);
+                        // _this.setMarkSelectedByIndex(index);
+                        canvas.setStyle('cursor: move');
+                        canvas.addEvent(_this, 'mousemove', 'scalemove', _this.scaleMove);
+                        canvas.addEvent(_this, 'mouseup', 'scaleup', _this.scaleUp);
+                    }
+                    break;
+                default:
+                    if (settings.creatable) {
+                        _this.setEventType('default');
+                        _this.setEventOrigin(event);
+                        _this.clearMarkSelected();
+                        canvas.removeEvent(_this, 'mousemove', 'active');
+                        canvas.setStyle('cursor: default');
+                        canvas.addEvent(_this, 'mousemove', 'create', _this.mouseMove);
+                        canvas.addEvent(_this, 'mouseup', 'create', _this.mouseUp);
+                    }
+            }
+        };
+        this.mouseMove = (event) => {
+            _this.setCurrent(event);
+            _this.renderList();
+            _this.renderCreating();
+        };
+        this.mouseUp = (event) => {
+            if (_this.isMarkCreatable(event)) {
+                _this.setCurrent(event);
+                _this.addCurrentToList();
+            } else {
+                alert('所选区域太小，请重现选取！');
+            }
+            _this.renderList();
+            _this.canvas.removeEvent(_this, 'mousemove', 'create');
+            _this.canvas.removeEvent(_this, 'mouseup', 'create');
+        };
+        this.selectMove = (event) => {
+            _this.setSelectMarkOffset(event);
+            _this.renderList();
+        };
+        this.selectUp = (event) => {
+            // _this.setSelectMarkOffset(event);
+            // _this.renderList();
+            _this.setEventType('none');
+            _this.canvas.removeEvent(_this, 'mousemove', 'move');
+            _this.canvas.removeEvent(_this, 'mouseup', 'move');
+
+            _this.canvas.addEvent(_this, 'mousemove', 'active', _this.activeMove);
+        };
+        this.scaleMove = (event) => {
+            _this.resizeSelectMark(event, _this.action.direction);
+            _this.renderList();
+        };
+        this.scaleUp = (event) => {
+            _this.eventType = 'none';
+            _this.canvas.removeEvent(_this, 'mousemove', 'scalemove');
+            _this.canvas.removeEvent(_this, 'mouseup', 'scaleup');
+        };
+        this.activeMove = (event) => {
+            _this.setCursorStyle(event);
+        };
+    }
+
     private initialize(): void {
         this.scaleZone = 10;
         this.zoom = 1;
@@ -495,5 +592,6 @@ export class Marker {
         this.markList = new MarkList([]);
         this.selectedMark = null;
         this.eventType = 'none';
+        this.initEvents();
     }
 }
