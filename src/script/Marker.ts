@@ -255,8 +255,8 @@ export class Marker {
         $.each(this.markList.list, function (index, item) {
             if (id === item.id) {
                 item.select();
-                item.saveOrigin();
-                item.saveSelectPosition(position);
+                item.setOriginPosition();
+                item.setOriginSelectPosition(position);
             }
         });
     }

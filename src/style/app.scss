@@ -30,3 +30,31 @@ body {
 .canvas {
 
 }
+
+.answer-list {
+  position: absolute;
+  left: 680px;
+  top: 510px;
+  background: #fff;
+  line-height: 30px;
+  list-style: none;
+  border: 2px solid #c00;
+  font-size: 14px;
+  li {
+    padding: 10px;
+    border-bottom: 1px dashed #ccc;
+    span {
+      margin-right: 5px;
+    }
+    input {
+      height: 30px;
+      line-height: 30px;
+      text-align: center;
+      font-size: 16px;
+      font-weight: bold;
+      &.active {
+        color: #c00;
+      }
+    }
+  }
+}

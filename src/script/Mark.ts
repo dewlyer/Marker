@@ -1,6 +1,10 @@
 /**
  * Mark Class
  */
+type Position = {
+    x: number;
+    y: number;
+};
 
 export interface MarkInterface {
     readonly id: string;
@@ -11,8 +15,13 @@ export interface MarkInterface {
 }
 
 export class Mark implements MarkInterface {
-    public origin: { width: number, height: number, x: number, y: number };
-    public selectPosition: { x: number, y: number };
+    public origin: {
+        x: number,
+        y: number
+        width: number,
+        height: number,
+    };
+    public selectPosition: Position;
 
     private readonly groupId: string;
     private selected: boolean;
@@ -71,42 +80,43 @@ export class Mark implements MarkInterface {
         this._height = height;
     }
 
-    public getGroupId() {
+    public getGroupId(): string {
         return this.groupId;
     }
 
-    public select() {
+    public select(): void {
         this.selected = true;
     }
 
-    public unselect() {
+    public unselect(): void {
         this.selected = false;
     }
 
-    public isSelected() {
+    public isSelected(): boolean {
         return this.selected;
     }
 
-    public check(check: boolean) {
+    public check(check: boolean): void {
         this.checked = check;
     }
 
-    public isChecked() {
+    public isChecked(): boolean {
         return this.checked;
     }
 
-    public saveSelectPosition(position) {
-        this.selectPosition = position;
-    }
-
-    public saveOrigin() {
+    public setOriginPosition(): void {
         this.origin = {
-            width: this.width,
-            height: this.height,
+            width: this._width,
+            height: this._height,
             x: this._x,
             y: this._y
         };
     }
 
-    private initialize(): void {}
+    public setOriginSelectPosition(position: Position): void {
+        this.selectPosition = position;
+    }
+
+    private initialize(): void {
+    }
 }
