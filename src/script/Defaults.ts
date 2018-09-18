@@ -1,6 +1,10 @@
-export let Defaults = {
+export const Defaults = {
     container: document.documentElement,
     canvasWidth: 0,
+    creatable: false,
+    draggable: true,
+    scalable: false,
+    data: null,
     style: {
         line: {
             join: {
@@ -45,9 +49,5 @@ export let Defaults = {
             }
         }
     },
-    data: null,
-    creatable: false,
-    draggable: true,
-    scalable: false,
-    afterCheck: function () {}
+    afterCheck: () => {}
 };

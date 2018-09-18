@@ -11,10 +11,10 @@ export interface MarkInterface {
 }
 
 export class Mark implements MarkInterface {
-    // private static penWidth = 1;
     public origin: { width: number, height: number, x: number, y: number };
     public selectPosition: { x: number, y: number };
-    private groupId: string;
+
+    private readonly groupId: string;
     private selected: boolean;
     private checked: boolean;
 
@@ -75,13 +75,6 @@ export class Mark implements MarkInterface {
         return this.groupId;
     }
 
-    public setGroupId(groupId) {
-        this.groupId = groupId;
-    }
-    public calculateArea(): number {
-        return this.width * this.height;
-    }
-
     public select() {
         this.selected = true;
     }
@@ -115,7 +108,5 @@ export class Mark implements MarkInterface {
         };
     }
 
-    private initialize(): void {
-        console.log('Class Mark Initialize Successfully', this.id);
-    }
+    private initialize(): void {}
 }

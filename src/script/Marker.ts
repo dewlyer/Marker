@@ -5,23 +5,18 @@ import { MarkCanvas } from './Canvas';
 import { Defaults } from './Defaults';
 
 export class Marker {
-    private static defaults = Defaults;
-
+    private static readonly defaults = Defaults;
     private markList: MarkList;
     private canvas: MarkCanvas;
     private settings: any;
-
     private zoom: number;
     private scaleZone: number;
-
-    private selectedMark: Mark;
-    private selectedOrigin: { x: number, y: number };
-    private selectIndex: null;
-
+    // private selectedMark: Mark;
+    // private selectedOrigin: { x: number, y: number };
+    // private selectIndex: null;
     private action: any;
     private eventOrigin: { x: number, y: number };
     private eventType: string;
-
     private mouseDown: Function;
     private mouseMove: Function;
     private mouseUp: Function;
@@ -32,9 +27,7 @@ export class Marker {
     private activeMove: Function;
 
     public constructor(canvas: HTMLCanvasElement, imageUrl: string, options?: any) {
-        this.settings = $.extend(Marker.defaults, options || {});
-        this.canvas = new MarkCanvas(canvas, imageUrl, this.settings.style);
-        this.initialize();
+        this.initialize(canvas, imageUrl, options);
     }
 
     public clearMarkSelected() {
@@ -247,12 +240,14 @@ export class Marker {
         return index;
     }
 
-    private getSelectedMarkIndex() {
-        if (!!this.selectedMark && typeof this.selectedMark.id !== 'undefined') {
-            return this.getMarkIndexById(this.selectedMark.id);
-        } else {
-            return null;
-        }
+    private getSelectedMarkIndex(): number | null {
+        let markIndex = null;
+        $.each(this.markList.list, (index, item) => {
+            if (item.isSelected()) {
+                markIndex = index;
+            }
+        });
+        return markIndex;
     }
 
     private setMarkSelectedById(id, event) {
@@ -400,7 +395,6 @@ export class Marker {
         return action;
     }
 
-
     private getEventPosition(event) {
         let scale = this.canvas.getScale();
         return {
@@ -415,7 +409,6 @@ export class Marker {
         let height = Math.abs(point.y - this.eventOrigin.y);
         return width > 2 * this.scaleZone && height > 2 * this.scaleZone;
     }
-
 
     private setCursorStyle(event) {
         let _this = this;
@@ -463,7 +456,6 @@ export class Marker {
     }
 
     // events
-
 
     private handleEvent() {
         this.canvas.addEvent(this, 'mousedown', 'start', this.mouseDown);
@@ -562,7 +554,7 @@ export class Marker {
             _this.setSelectMarkOffset(event);
             _this.renderList();
         };
-        this.selectUp = (event) => {
+        this.selectUp = () => {
             // _this.setSelectMarkOffset(event);
             // _this.renderList();
             _this.setEventType('none');
@@ -575,7 +567,7 @@ export class Marker {
             _this.resizeSelectMark(event, _this.action.direction);
             _this.renderList();
         };
-        this.scaleUp = (event) => {
+        this.scaleUp = () => {
             _this.eventType = 'none';
             _this.canvas.removeEvent(_this, 'mousemove', 'scalemove');
             _this.canvas.removeEvent(_this, 'mouseup', 'scaleup');
@@ -585,12 +577,13 @@ export class Marker {
         };
     }
 
-    private initialize(): void {
-        this.scaleZone = 10;
+    private initialize(canvas, imageUrl, options): void {
+        this.settings = $.extend({}, Marker.defaults, options || {});
+        this.canvas = new MarkCanvas(canvas, imageUrl, this.settings.style);
         this.zoom = 1;
+        this.scaleZone = 10;
         this.eventOrigin = {x: 0, y: 0};
         this.markList = new MarkList([]);
-        this.selectedMark = null;
         this.eventType = 'none';
         this.initEvents();
     }
