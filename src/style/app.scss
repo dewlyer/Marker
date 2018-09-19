@@ -14,6 +14,7 @@ body {
 }
 
 .canvas-wrap {
+  min-width: 1300px;
   padding-top: 50px;
   padding-left: 80px;
   &:after {
@@ -59,29 +60,46 @@ body {
   //left: 650px;
   //top: 360px;
   float: left;
-  height: 580px;
+  height: 588px;
   background: #fff;
-  line-height: 30px;
+  line-height: 28px;
   list-style: none;
-  padding: 10px 20px;
+  padding: 6px 20px;
   font-size: 14px;
   box-shadow: 0 1px 3px 1px rgba(0, 0, 0, 0.25);
   li {
-    padding: 6px 0;
-    border-bottom: 1px dashed #ccc;
+    margin: 5px 0;
+    padding: 5px 10px;
+    border: 1px dashed #ddd;
+    border-radius: 30px;
     text-align: right;
+    &.title {
+      margin: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      background: none;
+      border-color: #fff;
+    }
     span {
       float: left;
-      padding: 0 10px;
+      display: block;
+      width: 40px;
+      padding-left: 20px;
+      text-align: center;
     }
     input {
       width: 120px;
-      height: 30px;
-      line-height: 30px;
+      height: 28px;
+      line-height: 28px;
       text-align: center;
       font-size: 16px;
       font-weight: bold;
-      &.active {
+      outline: none;
+    }
+    &.active {
+      border-color: #c00;
+      color: #c00;
+      input {
         color: #c00;
       }
     }

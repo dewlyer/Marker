@@ -100,9 +100,8 @@ function initAnswerListEvent(paperMarker) {
             paperMarker.setGroupSelectedByCheck(groupId);
             let pos = paperMarker.getGroupCenterPosition(groupId);
             setCanvasPosition(pos);
-            $this.addClass('active')
-                .parent().siblings().children('input')
-                .removeClass('active');
+            $this.parent('li').addClass('active')
+                .siblings().removeClass('active');
         })
         .on('input', 'input', function () {
             let $this = $(this);
@@ -146,9 +145,9 @@ $(window).on('load', (): void => {
                 .filter(function () {
                     return $(this).data('group-id') === groupId;
                 })
-                .addClass('active').val(answer)
-                .parent().siblings().children('input')
-                .removeClass('active');
+                .val(answer)
+                .parent('li').addClass('active')
+                .siblings().removeClass('active');
         },
         startDrag: (x, y) => {
             if (dragCoords === null) {
@@ -157,9 +156,8 @@ $(window).on('load', (): void => {
             dragCoords = updateDraggingPosition(dragCoords, x, y);
             // console.log(x, y);
         },
-        endDrag: (x, y) => {
+        endDrag: () => {
             dragCoords = null;
-            // console.log(x, y);
         }
     };
 
@@ -221,6 +219,6 @@ $(window).on('load', (): void => {
             }
         }
         initAnswerListEvent(paperMarker);
-        $('.answer-list').find('input[data-group-id]').first().trigger('focusin');
+        // $('.answer-list').find('input[data-group-id]').first().trigger('focusin');
     });
 });

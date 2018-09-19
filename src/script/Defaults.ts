@@ -6,7 +6,7 @@ export const Defaults = {
     scalable: false,
     data: null,
     style: {
-        opacity: 0.25,
+        opacity: 0.3,
         line: {
             join: {
                 normal: 'round',
@@ -29,7 +29,7 @@ export const Defaults = {
             color: {
                 normal: 'rgb(0, 0, 255)',
                 active: 'rgb(255, 48, 0)',
-                select: 'rgb(255, 0, 0)',
+                select: 'rgb(255, 255, 255)',
                 check: 'rgb(0, 255, 0)'
             }
         },
@@ -37,7 +37,7 @@ export const Defaults = {
             color: {
                 normal: 'rgb(0, 0, 255)',
                 active: 'rgba(255, 48, 0)',
-                select: 'rgb(255, 0, 0)',
+                select: 'rgb(255, 255, 255)',
                 check: 'rgb(0, 255, 0)'
             }
         },
@@ -52,5 +52,5 @@ export const Defaults = {
     },
     afterCheck: (groupId, groupIndexArr) => {},
     startDrag: (x, y) => {},
-    endDrag: (x, y) => {}
+    endDrag: () => {}
 };

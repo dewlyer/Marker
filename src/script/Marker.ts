@@ -22,6 +22,8 @@ export class Marker {
     private mouseUp: Function;
     private selectMove: Function;
     private selectUp: Function;
+    private multipleSelectMove: Function;
+    private multipleSelectUp: Function;
     private scaleMove: Function;
     private scaleUp: Function;
     private activeMove: Function;
@@ -74,18 +76,27 @@ export class Marker {
         this.renderList();
     }
 
-    public setGroupCheckedByClick(id) {
+    public setGroupCheckedByClick(id, single, toggle) {
         let current = this.getMarkById(id);
         let groupId = current.groupId;
         let groupIndexArr = [];
         let i = 0;
         $.each(this.markList.list, function (index, item) {
             if (item.getGroupId() === groupId) {
-                if (item.id === id) {
-                    item.check(true);
-                    groupIndexArr.push(i);
+                // TODO
+                if (single) {
+                    item.check(item.id === id);
                 } else {
-                    item.check(false);
+                    if (item.id === id) {
+                        if (toggle) {
+                            item.check(!item.isChecked());
+                        } else {
+                            item.check(true);
+                        }
+                    }
+                }
+                if (item.isChecked()) {
+                    groupIndexArr.push(i);
                 }
                 i++;
             }
@@ -269,13 +280,16 @@ export class Marker {
         return markIndex;
     }
 
-    private setMarkSelectedById(id, event) {
-        let position = this.getEventPosition(event);
+    private setMarkSelectedById(id, single, toggle) {
         $.each(this.markList.list, function (index, item) {
             if (id === item.id) {
-                item.select();
-                item.setOriginPosition();
-                item.setOriginSelectPosition(position);
+                if (!toggle || !item.isSelected()) {
+                    item.select();
+                } else {
+                    item.unselect();
+                }
+            } else if (single) {
+                item.unselect();
             }
         });
     }
@@ -290,6 +304,18 @@ export class Marker {
         //     x: selectItem.x,
         //     y: selectItem.y
         // };
+    }
+
+    private setMarkSelectedByBox(box) {
+        console.log(box);
+        $.each(this.markList.list, function (index, item) {
+            // TODO
+            if (item.x >= box.x && item.x <= (box.x + box.width) && item.y >= box.y && item.y <= (box.y + box.height)) {
+                item.select();
+            } else {
+                item.unselect();
+            }
+        });
     }
 
     private setMarkListByData(data) {
@@ -317,9 +343,21 @@ export class Marker {
     private setSelectMarkOffset(event) {
         let position = this.getEventPosition(event);
         $.each(this.markList.list, function (index, item) {
-            if (item.isSelected()) {
-                item.x = position.x + item.origin.x - item.selectPosition.x;
-                item.y = position.y + item.origin.y - item.selectPosition.y;
+            let selectPos = Mark.getSelectPosition();
+            if (selectPos && item.isSelected()) {
+                item.x = item.origin.x + position.x - selectPos.x;
+                item.y = item.origin.y + position.y - selectPos.y;
+            }
+        });
+    }
+
+    private updateSelectMarkOrigin(event) {
+        let position = this.getEventPosition(event);
+        $.each(this.markList.list, function (index, item) {
+            let selectPos = Mark.getSelectPosition();
+            if (selectPos && item.isSelected()) {
+                item.origin.x = item.origin.x + position.x - selectPos.x;
+                item.origin.y = item.origin.y + position.y - selectPos.y;
             }
         });
     }
@@ -332,8 +370,8 @@ export class Marker {
         $.each(this.markList.list, function (index, item) {
             let offsetW, offsetH;
             if (item.isSelected()) {
-                offsetW = point.x - item.selectPosition.x;
-                offsetH = point.y - item.selectPosition.y;
+                offsetW = point.x - Mark.getSelectPosition().x;
+                offsetH = point.y - Mark.getSelectPosition().y;
                 $.each(ways, function (i, way) {
                     if (way === 'left') {
                         if (offsetW <= 0 || item.width >= 2 * _this.scaleZone) {
@@ -520,14 +558,15 @@ export class Marker {
             switch (name) {
                 case 'move':
                     if (settings.draggable) {
-                        _this.setEventType(name);
-                        _this.clearMarkSelected();
                         canvas.removeEvent(_this, 'mousemove', 'active');
-                        _this.setMarkSelectedById(id, event);
-                        _this.setGroupCheckedByClick(id);
+                        _this.setEventType(name);
+                        // _this.clearMarkSelected();
+                        Mark.setSelectPosition(_this.getEventPosition(event));
+                        // _this.setMarkSelectedById(id, !event.shiftKey, true);
+                        _this.setGroupCheckedByClick(id, false  , true);
                         // _this.sortMarkList(index);
                         _this.renderList();
-                        canvas.setCursorStyle('move');
+                        // canvas.setCursorStyle('move');
                         canvas.addEvent(_this, 'mousemove', 'move', _this.selectMove);
                         canvas.addEvent(_this, 'mouseup', 'move', _this.selectUp);
                     }
@@ -535,7 +574,8 @@ export class Marker {
                 case 'scale':
                     if (settings.scalable) {
                         _this.setEventType(name);
-                        _this.setMarkSelectedById(id, event);
+                        Mark.setSelectPosition(_this.getEventPosition(event));
+                        _this.setMarkSelectedById(id, false, false);
                         // _this.setMarkSelectedByIndex(index);
                         canvas.setCursorStyle('move');
                         canvas.addEvent(_this, 'mousemove', 'scalemove', _this.scaleMove);
@@ -552,11 +592,15 @@ export class Marker {
                     if (settings.creatable) {
                         canvas.addEvent(_this, 'mousemove', 'create', _this.mouseMove);
                         canvas.addEvent(_this, 'mouseup', 'create', _this.mouseUp);
+                    } else if (event.metaKey || event.ctrlKey) {
+                        canvas.addEvent(_this, 'mousemove', 'select', _this.multipleSelectMove);
+                        canvas.addEvent(_this, 'mouseup', 'select', _this.multipleSelectUp);
                     } else {
                         canvas.addEvent(_this, 'mousemove', 'drag', _this.dragCanvasStart);
                         canvas.addEvent(_this, 'mouseup', 'drag', _this.dragCanvasEnd);
                     }
             }
+            return false;
         };
         this.mouseMove = (event) => {
             _this.setCurrent(event);
@@ -574,17 +618,30 @@ export class Marker {
             _this.canvas.removeEvent(_this, 'mousemove', 'create');
             _this.canvas.removeEvent(_this, 'mouseup', 'create');
         };
+        this.multipleSelectMove = (event) => {
+            _this.setCurrent(event);
+            _this.renderList();
+            _this.renderCreating();
+        };
+        this.multipleSelectUp = (event) => {
+            // if (_this.isMarkCreatable(event)) {
+            //     _this.setCurrent(event);
+            //     _this.addCurrentToList();
+            // }
+            _this.setMarkSelectedByBox(_this.getCurrent());
+            _this.renderList();
+            _this.canvas.removeEvent(_this, 'mousemove', 'select');
+            _this.canvas.removeEvent(_this, 'mouseup', 'select');
+        };
         this.selectMove = (event) => {
             _this.setSelectMarkOffset(event);
             _this.renderList();
         };
-        this.selectUp = () => {
-            // _this.setSelectMarkOffset(event);
-            // _this.renderList();
+        this.selectUp = (event) => {
+            _this.updateSelectMarkOrigin(event);
             _this.setEventType('none');
             _this.canvas.removeEvent(_this, 'mousemove', 'move');
             _this.canvas.removeEvent(_this, 'mouseup', 'move');
-
             _this.canvas.addEvent(_this, 'mousemove', 'active', _this.activeMove);
         };
         this.scaleMove = (event) => {
@@ -599,16 +656,15 @@ export class Marker {
         this.activeMove = (event) => {
             _this.setCursorStyle(event);
         };
-
         this.dragCanvasStart = (event) => {
             _this.canvas.setCursorStyle('move');
             _this.settings.startDrag(event.pageX, event.pageY);
         };
-        this.dragCanvasEnd = (event) => {
+        this.dragCanvasEnd = () => {
             _this.canvas.setCursorStyle('default');
             _this.canvas.removeEvent(_this, 'mousemove', 'drag');
             _this.canvas.removeEvent(_this, 'mouseup', 'drag');
-            _this.settings.endDrag(event.pageX, event.pageY);
+            _this.settings.endDrag();
         };
     }
 

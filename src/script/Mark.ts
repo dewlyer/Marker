@@ -15,13 +15,22 @@ export interface MarkInterface {
 }
 
 export class Mark implements MarkInterface {
+    public static getSelectPosition(): Position {
+        return Mark.selectPosition;
+    }
+
+    public static setSelectPosition(position: Position): void {
+        Mark.selectPosition = position;
+    }
+
+    private static selectPosition: Position;
+
     public origin: {
         x: number,
         y: number
         width: number,
         height: number,
     };
-    public selectPosition: Position;
 
     private readonly groupId: string;
     private selected: boolean;
@@ -113,10 +122,7 @@ export class Mark implements MarkInterface {
         };
     }
 
-    public setOriginSelectPosition(position: Position): void {
-        this.selectPosition = position;
-    }
-
     private initialize(): void {
+        this.setOriginPosition();
     }
 }
