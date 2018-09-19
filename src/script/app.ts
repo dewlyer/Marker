@@ -1,15 +1,15 @@
 // import bg from '../images/bg.jpg';
 import '../style/app.scss';
 import * as $ from 'jquery';
-import { Marker as PaperMarker } from './Marker';
+import {Marker as PaperMarker} from './Marker';
 
 const AnswerList = 'ABCD';
 const pageData = [
     // 第1题
-    {x: 201, y: 595, width: 27, height: 16, groupId: '001'},
-    {x: 233, y: 595, width: 27, height: 16, groupId: '001'},
+    {x: 201, y: 595, width: 27, height: 16, groupId: '001', checked: true},
+    {x: 233, y: 595, width: 27, height: 16, groupId: '001', checked: true},
     {x: 265, y: 595, width: 27, height: 16, groupId: '001', checked: true},
-    {x: 297, y: 595, width: 27, height: 16, groupId: '001'},
+    {x: 297, y: 595, width: 27, height: 16, groupId: '001', checked: true},
     // 第2题
     {x: 201, y: 616, width: 27, height: 16, groupId: '002'},
     {x: 233, y: 616, width: 27, height: 16, groupId: '002'},
@@ -36,10 +36,35 @@ const pageData = [
     {x: 425, y: 637, width: 27, height: 16, groupId: '006', checked: true},
     {x: 457, y: 637, width: 27, height: 16, groupId: '006'},
     // 第7题
-    {x: 361, y: 637, width: 27, height: 16, groupId: '006'},
-    {x: 393, y: 637, width: 27, height: 16, groupId: '006'},
-    {x: 425, y: 637, width: 27, height: 16, groupId: '006', checked: true},
-    {x: 457, y: 637, width: 27, height: 16, groupId: '006'}
+    {x: 519, y: 595, width: 27, height: 16, groupId: '007', checked: true},
+    {x: 551, y: 595, width: 27, height: 16, groupId: '007'},
+    {x: 583, y: 595, width: 27, height: 16, groupId: '007'},
+    {x: 615, y: 595, width: 27, height: 16, groupId: '007'},
+    // 第8题
+    {x: 519, y: 616, width: 27, height: 16, groupId: '008'},
+    {x: 551, y: 616, width: 27, height: 16, groupId: '008', checked: true},
+    {x: 583, y: 616, width: 27, height: 16, groupId: '008'},
+    {x: 615, y: 616, width: 27, height: 16, groupId: '008'},
+    // 第9题
+    {x: 519, y: 637, width: 27, height: 16, groupId: '009'},
+    {x: 551, y: 637, width: 27, height: 16, groupId: '009'},
+    {x: 583, y: 637, width: 27, height: 16, groupId: '009', checked: true},
+    {x: 615, y: 637, width: 27, height: 16, groupId: '009'},
+    // 第10题
+    {x: 677, y: 595, width: 27, height: 16, groupId: '010'},
+    {x: 709, y: 595, width: 27, height: 16, groupId: '010'},
+    {x: 741, y: 595, width: 27, height: 16, groupId: '010'},
+    {x: 773, y: 595, width: 27, height: 16, groupId: '010', checked: true},
+    // 第11题
+    {x: 677, y: 616, width: 27, height: 16, groupId: '011'},
+    {x: 709, y: 616, width: 27, height: 16, groupId: '011', checked: true},
+    {x: 741, y: 616, width: 27, height: 16, groupId: '011'},
+    {x: 773, y: 616, width: 27, height: 16, groupId: '011'},
+    // 第12题
+    {x: 677, y: 637, width: 27, height: 16, groupId: '012'},
+    {x: 709, y: 637, width: 27, height: 16, groupId: '012'},
+    {x: 741, y: 637, width: 27, height: 16, groupId: '012', checked: true},
+    {x: 773, y: 637, width: 27, height: 16, groupId: '012'},
 ];
 
 function setCanvasPosition(position) {
@@ -61,7 +86,6 @@ function initAnswerListEvent(paperMarker) {
             paperMarker.clearMarkSelected();
             paperMarker.setGroupSelectedByCheck(groupId);
             let pos = paperMarker.getGroupCenterPosition(groupId);
-            console.log(pos);
             setCanvasPosition(pos);
             $this.addClass('active')
                 .parent().siblings().children('input')
@@ -70,15 +94,22 @@ function initAnswerListEvent(paperMarker) {
         .on('input', 'input', function () {
             let $this = $(this);
             let groupId = $this.data('group-id');
-            let str = $this.val().toString().toUpperCase();
-            let index = AnswerList.indexOf(str);
-            if (index !== -1) {
+            let strArr = $this.val().toString().toUpperCase().split('');
+            let indexArr: Array<number> = [];
+            $.each(strArr, function (i, str) {
+                let index = AnswerList.indexOf(str);
+                if (index !== -1) {
+                    indexArr.push(index);
+                } else {
+                    window.alert('答案输入有误！');
+                }
+            });
+            if (indexArr.length) {
                 paperMarker.clearMarkSelected();
-                paperMarker.setGroupChecked(groupId, index);
+                paperMarker.setGroupChecked(groupId, indexArr);
                 paperMarker.setGroupSelectedByCheck(groupId);
-            } else {
-                window.alert('答案输入不正确，请重新输入！');
             }
+
             $this.val($this.val().toString().toUpperCase());
         });
 }

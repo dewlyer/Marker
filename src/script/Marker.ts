@@ -47,13 +47,13 @@ export class Marker {
         this.markList.list[index].check(checked);
     }
 
-    public setGroupChecked(groupId, groupIndex) {
+    public setGroupChecked(groupId, groupIndexArr) {
         let _this = this;
         let i = 0;
         $.each(this.markList.list, function (index, item) {
             let checked;
             if (item.getGroupId() === groupId) {
-                checked = groupIndex === i;
+                checked = groupIndexArr.indexOf(i) !== -1;
                 // _this.setMarkChecked(item, groupIndex === i);
                 _this.setMarkCheckedByIndex(index, checked);
                 i++;
