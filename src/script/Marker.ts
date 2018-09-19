@@ -25,6 +25,8 @@ export class Marker {
     private scaleMove: Function;
     private scaleUp: Function;
     private activeMove: Function;
+    private dragCanvasStart: Function;
+    private dragCanvasEnd: Function;
 
     public constructor(canvas: HTMLCanvasElement, imageUrl: string, options?: any) {
         this.initialize(canvas, imageUrl, options);
@@ -75,13 +77,13 @@ export class Marker {
     public setGroupCheckedByClick(id) {
         let current = this.getMarkById(id);
         let groupId = current.groupId;
-        let groupIndex = null;
+        let groupIndexArr = [];
         let i = 0;
         $.each(this.markList.list, function (index, item) {
             if (item.getGroupId() === groupId) {
                 if (item.id === id) {
-                    groupIndex = i;
                     item.check(true);
+                    groupIndexArr.push(i);
                 } else {
                     item.check(false);
                 }
@@ -89,7 +91,7 @@ export class Marker {
             }
         });
         if (typeof this.settings.afterCheck === 'function') {
-            this.settings.afterCheck(groupId, groupIndex);
+            this.settings.afterCheck(groupId, groupIndexArr);
         }
     }
 
@@ -541,14 +543,18 @@ export class Marker {
                     }
                     break;
                 default:
+                    _this.setEventType('default');
+                    _this.setEventOrigin(event);
+                    _this.clearMarkSelected();
+                    _this.renderList();
+                    canvas.setCursorStyle('default');
+                    canvas.removeEvent(_this, 'mousemove', 'active');
                     if (settings.creatable) {
-                        _this.setEventType('default');
-                        _this.setEventOrigin(event);
-                        _this.clearMarkSelected();
-                        canvas.removeEvent(_this, 'mousemove', 'active');
-                        canvas.setCursorStyle('default');
                         canvas.addEvent(_this, 'mousemove', 'create', _this.mouseMove);
                         canvas.addEvent(_this, 'mouseup', 'create', _this.mouseUp);
+                    } else {
+                        canvas.addEvent(_this, 'mousemove', 'drag', _this.dragCanvasStart);
+                        canvas.addEvent(_this, 'mouseup', 'drag', _this.dragCanvasEnd);
                     }
             }
         };
@@ -592,6 +598,17 @@ export class Marker {
         };
         this.activeMove = (event) => {
             _this.setCursorStyle(event);
+        };
+
+        this.dragCanvasStart = (event) => {
+            _this.canvas.setCursorStyle('move');
+            _this.settings.startDrag(event.pageX, event.pageY);
+        };
+        this.dragCanvasEnd = (event) => {
+            _this.canvas.setCursorStyle('default');
+            _this.canvas.removeEvent(_this, 'mousemove', 'drag');
+            _this.canvas.removeEvent(_this, 'mouseup', 'drag');
+            _this.settings.endDrag(event.pageX, event.pageY);
         };
     }
 

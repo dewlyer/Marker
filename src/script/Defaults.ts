@@ -50,5 +50,7 @@ export const Defaults = {
             }
         }
     },
-    afterCheck: () => {}
+    afterCheck: (groupId, groupIndexArr) => {},
+    startDrag: (x, y) => {},
+    endDrag: (x, y) => {}
 };

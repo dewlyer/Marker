@@ -76,6 +76,19 @@ function setCanvasPosition(position) {
     });
 }
 
+function updateDraggingPosition(coords, x, y) {
+    let $target = $('#canvas');
+    let left = parseInt($target.css('left'), 10);
+    let top = parseInt($target.css('top'), 10);
+    $target.css({
+        left: left + x - coords.x,
+        top: top + y - coords.y
+    });
+    coords.x = x;
+    coords.y = y;
+    return coords;
+}
+
 function initAnswerListEvent(paperMarker) {
     $('.answer-list')
         .on('focus', 'input', function () {
@@ -119,12 +132,16 @@ $(window).on('load', (): void => {
     let imageUrl = canvas.data('img');
     let paperMarker: PaperMarker;
     let events: object;
+    let dragCoords = null;
     let option = {
         container: '#container',
         data: pageData,
-        afterCheck: (groupId, index) => {
-            console.log(this);
-            let answer = AnswerList[index];
+        afterCheck: (groupId, indexArr) => {
+            let answer = '';
+            indexArr.sort();
+            $.each(indexArr, function (index, item) {
+                answer += AnswerList[item];
+            });
             $('.answer-list').find('input')
                 .filter(function () {
                     return $(this).data('group-id') === groupId;
@@ -132,6 +149,17 @@ $(window).on('load', (): void => {
                 .addClass('active').val(answer)
                 .parent().siblings().children('input')
                 .removeClass('active');
+        },
+        startDrag: (x, y) => {
+            if (dragCoords === null) {
+                dragCoords = {x: x, y: y};
+            }
+            dragCoords = updateDraggingPosition(dragCoords, x, y);
+            // console.log(x, y);
+        },
+        endDrag: (x, y) => {
+            dragCoords = null;
+            // console.log(x, y);
         }
     };
 
