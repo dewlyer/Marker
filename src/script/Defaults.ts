@@ -6,6 +6,7 @@ export const Defaults = {
     scalable: false,
     data: null,
     style: {
+        opacity: 0.25,
         line: {
             join: {
                 normal: 'round',
@@ -26,26 +27,26 @@ export const Defaults = {
                 check: 1
             },
             color: {
-                normal: 'rgb(0, 0, 255, 0.25)',
+                normal: 'rgb(0, 0, 255)',
                 active: 'rgb(255, 48, 0)',
-                select: 'rgb(255, 0, 0, 0.25)',
-                check: 'rgb(0, 255, 0, 0.25)'
+                select: 'rgb(255, 0, 0)',
+                check: 'rgb(0, 255, 0)'
             }
         },
         rect: {
             color: {
-                normal: 'rgb(0, 0, 255, 0.25)',
-                active: 'rgba(255, 48, 0, 0.25)',
-                select: 'rgb(255, 0, 0, 0.25)',
-                check: 'rgb(0, 255, 0, 0.25)'
+                normal: 'rgb(0, 0, 255)',
+                active: 'rgba(255, 48, 0)',
+                select: 'rgb(255, 0, 0)',
+                check: 'rgb(0, 255, 0)'
             }
         },
         text: {
             font: '14px Arial',
-            bg: 'rgba(255, 255, 255, 0.75)',
+            bg: 'rgba(255, 255, 255)',
             color: {
-                normal: 'rgba(255, 255, 255, 0.75)',
-                select: 'rgba(255, 255, 255, 0.75)'
+                normal: 'rgba(255, 255, 255)',
+                select: 'rgba(255, 255, 255)'
             }
         }
     },

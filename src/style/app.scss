@@ -4,12 +4,32 @@
   border: 0;
 }
 
+html {
+  background: #ddd;
+}
+
 body {
+  background: #ddd;
   font-size: 12px;
 }
 
 .canvas-wrap {
-
+  padding-top: 50px;
+  padding-left: 80px;
+  &:after {
+    content: '';
+    display: table;
+    clear: both;
+  }
+}
+.canvas-scroll {
+  position: relative;
+  float: left;
+  width: 1000px;
+  height: 600px;
+  overflow: hidden;
+  background: #999;
+  box-shadow: 0 1px 3px 1px rgba(0, 0, 0, 0.25);
 }
 
 .canvas-buts {
@@ -28,25 +48,33 @@ body {
 }
 
 .canvas {
-
+  position: absolute;
+  left: 0;
+  top: 0;
 }
 
 .answer-list {
-  position: absolute;
-  left: 680px;
-  top: 510px;
+  //position: absolute;
+  //left: 650px;
+  //top: 360px;
+  float: left;
+  height: 580px;
   background: #fff;
   line-height: 30px;
   list-style: none;
-  border: 2px solid #c00;
+  padding: 10px 20px;
   font-size: 14px;
+  box-shadow: 0 1px 3px 1px rgba(0, 0, 0, 0.25);
   li {
-    padding: 10px;
+    padding: 6px 0;
     border-bottom: 1px dashed #ccc;
+    text-align: right;
     span {
-      margin-right: 5px;
+      float: left;
+      padding: 0 10px;
     }
     input {
+      width: 120px;
       height: 30px;
       line-height: 30px;
       text-align: center;

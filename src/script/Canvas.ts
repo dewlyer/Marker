@@ -17,6 +17,10 @@ export class MarkCanvas {
         return this.scale;
     }
 
+    public getOffset() {
+        return $(this.el).offset();
+    }
+
     public setScale(scale: number): void {
         this.scale = scale;
     }
@@ -30,8 +34,9 @@ export class MarkCanvas {
         this.el.height = this.size.height * this.scale;
     }
 
-    public setStyle(style) {
-        this.el.setAttribute('style', style);
+    public setCursorStyle(style) {
+        $(this.el).css('cursor', style);
+        // this.el.setAttribute('style', style);
     }
 
     public addEvent(scope, type, namespace, listener) {
@@ -75,6 +80,7 @@ export class MarkCanvas {
         this.ctx.lineWidth = this.style.line.width.normal;
         this.ctx.strokeStyle = this.style.line.color.normal;
         this.ctx.fillStyle = this.style.rect.color.normal;
+        this.ctx.globalAlpha = this.style.opacity;
 
         $.each(markList.list, (index, item) => {
             if (item.isSelected()) {

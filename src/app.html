@@ -7,9 +7,11 @@
 </head>
 <body>
 <div id="canvasWrap" class="canvas-wrap">
-    <canvas class="canvas" id="canvas" width="300" height="300" data-img="http://znxunzhi-marking-pic.oss-cn-shenzhen.aliyuncs.com/430100-b764faa32b48416782486482fe9e98d6/002/882f20f4-eef3-487c-9e19-c4847be4c102/Card-A-masked.png?t=1537164975436">
-        当前浏览器不支持 Canvas
-    </canvas>
+    <div class="canvas-scroll" id="container">
+        <canvas class="canvas" id="canvas" width="300" height="300" data-img="http://znxunzhi-marking-pic.oss-cn-shenzhen.aliyuncs.com/430100-b764faa32b48416782486482fe9e98d6/002/882f20f4-eef3-487c-9e19-c4847be4c102/Card-A-masked.png?t=1537164975436">
+            当前浏览器不支持 Canvas
+        </canvas>
+    </div>
     <div class="canvas-buts">
         <div><button type="button" class="canvas-button" id="clearRectList">全部清除</button></div>
         <div><button type="button" class="canvas-button" id="clearRectSelect">删除选中</button></div>
@@ -21,28 +23,56 @@
 
     <ul class="answer-list">
         <li>
-            <span>题号-1</span>
-            <input type="text" value="A" title="1" data-group-id="001">
+            <span>题号</span>
+            <input type="text" value="选择结果" title="1" readonly disabled>
         </li>
         <li>
-            <span>题号-2</span>
-            <input type="text" value="B" title="1" data-group-id="002">
+            <span>01</span>
+            <input type="text" value="C" title="01" data-group-id="001">
         </li>
         <li>
-            <span>题号-3</span>
-            <input type="text" value="C" title="1" data-group-id="003">
+            <span>02</span>
+            <input type="text" value="D" title="02" data-group-id="002">
         </li>
         <li>
-            <span>题号-4</span>
-            <input type="text" value="D" title="1" data-group-id="004">
+            <span>03</span>
+            <input type="text" value="B" title="03" data-group-id="003">
         </li>
         <li>
-            <span>题号-5</span>
-            <input type="text" value="C" title="1" data-group-id="005">
+            <span>04</span>
+            <input type="text" value="A" title="04" data-group-id="004">
         </li>
         <li>
-            <span>题号-6</span>
-            <input type="text" value="B" title="1" data-group-id="006">
+            <span>05</span>
+            <input type="text" value="D" title="05" data-group-id="005">
+        </li>
+        <li>
+            <span>06</span>
+            <input type="text" value="C" title="06" data-group-id="006">
+        </li>
+        <li>
+            <span>07</span>
+            <input type="text" value="D" title="1" data-group-id="007">
+        </li>
+        <li>
+            <span>08</span>
+            <input type="text" value="C" title="1" data-group-id="008">
+        </li>
+        <li>
+            <span>09</span>
+            <input type="text" value="B" title="1" data-group-id="009">
+        </li>
+        <li>
+            <span>10</span>
+            <input type="text" value="D" title="1" data-group-id="010">
+        </li>
+        <li>
+            <span>11</span>
+            <input type="text" value="C" title="1" data-group-id="011">
+        </li>
+        <li>
+            <span>12</span>
+            <input type="text" value="B" title="1" data-group-id="012">
         </li>
     </ul>
 </div>

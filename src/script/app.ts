@@ -5,37 +5,83 @@ import { Marker as PaperMarker } from './Marker';
 
 const AnswerList = 'ABCD';
 const pageData = [
-    // 第一题
-    {x: 201, y: 595, width: 27, height: 16, groupId: '001', checked: true},
+    // 第1题
+    {x: 201, y: 595, width: 27, height: 16, groupId: '001'},
     {x: 233, y: 595, width: 27, height: 16, groupId: '001'},
-    {x: 265, y: 595, width: 27, height: 16, groupId: '001'},
+    {x: 265, y: 595, width: 27, height: 16, groupId: '001', checked: true},
     {x: 297, y: 595, width: 27, height: 16, groupId: '001'},
-    // 第二题
+    // 第2题
     {x: 201, y: 616, width: 27, height: 16, groupId: '002'},
-    {x: 233, y: 616, width: 27, height: 16, groupId: '002', checked: true},
+    {x: 233, y: 616, width: 27, height: 16, groupId: '002'},
     {x: 265, y: 616, width: 27, height: 16, groupId: '002'},
-    {x: 297, y: 616, width: 27, height: 16, groupId: '002'},
-    // 第三题
+    {x: 297, y: 616, width: 27, height: 16, groupId: '002', checked: true},
+    // 第3题
     {x: 201, y: 637, width: 27, height: 16, groupId: '003'},
-    {x: 233, y: 637, width: 27, height: 16, groupId: '003'},
-    {x: 265, y: 637, width: 27, height: 16, groupId: '003', checked: true},
+    {x: 233, y: 637, width: 27, height: 16, groupId: '003', checked: true},
+    {x: 265, y: 637, width: 27, height: 16, groupId: '003'},
     {x: 297, y: 637, width: 27, height: 16, groupId: '003'},
-    // 第四题
-    {x: 361, y: 595, width: 27, height: 16, groupId: '004'},
+    // 第4题
+    {x: 361, y: 595, width: 27, height: 16, groupId: '004', checked: true},
     {x: 393, y: 595, width: 27, height: 16, groupId: '004'},
     {x: 425, y: 595, width: 27, height: 16, groupId: '004'},
-    {x: 457, y: 595, width: 27, height: 16, groupId: '004', checked: true},
-    // 第五题
+    {x: 457, y: 595, width: 27, height: 16, groupId: '004'},
+    // 第5题
     {x: 361, y: 616, width: 27, height: 16, groupId: '005'},
     {x: 393, y: 616, width: 27, height: 16, groupId: '005'},
-    {x: 425, y: 616, width: 27, height: 16, groupId: '005', checked: true},
-    {x: 457, y: 616, width: 27, height: 16, groupId: '005'},
-    // 第六题
+    {x: 425, y: 616, width: 27, height: 16, groupId: '005'},
+    {x: 457, y: 616, width: 27, height: 16, groupId: '005', checked: true},
+    // 第6题
     {x: 361, y: 637, width: 27, height: 16, groupId: '006'},
-    {x: 393, y: 637, width: 27, height: 16, groupId: '006', checked: true},
-    {x: 425, y: 637, width: 27, height: 16, groupId: '006'},
+    {x: 393, y: 637, width: 27, height: 16, groupId: '006'},
+    {x: 425, y: 637, width: 27, height: 16, groupId: '006', checked: true},
+    {x: 457, y: 637, width: 27, height: 16, groupId: '006'},
+    // 第7题
+    {x: 361, y: 637, width: 27, height: 16, groupId: '006'},
+    {x: 393, y: 637, width: 27, height: 16, groupId: '006'},
+    {x: 425, y: 637, width: 27, height: 16, groupId: '006', checked: true},
     {x: 457, y: 637, width: 27, height: 16, groupId: '006'}
 ];
+
+function setCanvasPosition(position) {
+    let $container = $('#container');
+    let $target = $('#canvas');
+    $target.css({
+        left: $container.width() / 2 - position.x,
+        top: $container.height() / 2 - position.y
+    });
+}
+
+function initAnswerListEvent(paperMarker) {
+    $('.answer-list')
+        .on('focus', 'input', function () {
+            let $this = $(this);
+            let input = <HTMLInputElement> $this.get(0);
+            let groupId = $this.data('group-id');
+            input.select();
+            paperMarker.clearMarkSelected();
+            paperMarker.setGroupSelectedByCheck(groupId);
+            let pos = paperMarker.getGroupCenterPosition(groupId);
+            console.log(pos);
+            setCanvasPosition(pos);
+            $this.addClass('active')
+                .parent().siblings().children('input')
+                .removeClass('active');
+        })
+        .on('input', 'input', function () {
+            let $this = $(this);
+            let groupId = $this.data('group-id');
+            let str = $this.val().toString().toUpperCase();
+            let index = AnswerList.indexOf(str);
+            if (index !== -1) {
+                paperMarker.clearMarkSelected();
+                paperMarker.setGroupChecked(groupId, index);
+                paperMarker.setGroupSelectedByCheck(groupId);
+            } else {
+                window.alert('答案输入不正确，请重新输入！');
+            }
+            $this.val($this.val().toString().toUpperCase());
+        });
+}
 
 $(window).on('load', (): void => {
     let canvas = $('#canvas');
@@ -43,8 +89,10 @@ $(window).on('load', (): void => {
     let paperMarker: PaperMarker;
     let events: object;
     let option = {
+        container: '#container',
         data: pageData,
         afterCheck: (groupId, index) => {
+            console.log(this);
             let answer = AnswerList[index];
             $('.answer-list').find('input')
                 .filter(function () {
@@ -113,32 +161,7 @@ $(window).on('load', (): void => {
                     document.getElementById(key).addEventListener('click', listener);
             }
         }
-
-        $('.answer-list')
-            .on('input', 'input', function () {
-                let $this = $(this);
-                let groupId = $this.data('group-id');
-                let str = $this.val().toString().toUpperCase();
-                let index = AnswerList.indexOf(str);
-                if (index !== -1) {
-                    paperMarker.clearMarkSelected();
-                    paperMarker.setGroupChecked(groupId, index);
-                    paperMarker.setGroupSelectedByCheck(groupId);
-                } else {
-                    window.alert('答案输入不正确，请重新输入！');
-                }
-                $this.val($this.val().toString().toUpperCase());
-            })
-            .on('focus', 'input', function () {
-                let $this = $(this);
-                let input = <HTMLInputElement> $this.get(0);
-                let groupId = $this.data('group-id');
-                input.select();
-                paperMarker.clearMarkSelected();
-                paperMarker.setGroupSelectedByCheck(groupId);
-                $this.addClass('active')
-                    .parent().siblings().children('input')
-                    .removeClass('active');
-            });
+        initAnswerListEvent(paperMarker);
+        $('.answer-list').find('input[data-group-id]').first().trigger('focusin');
     });
 });

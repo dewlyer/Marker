@@ -107,6 +107,23 @@ export class Marker {
         return checkList.join(',');
     }
 
+    public getGroupCenterPosition(groupId) {
+        let x = [];
+        let y = [];
+        $.each(this.markList.list, function (index, item) {
+            if (item.getGroupId() === groupId) {
+                x.push(item.x);
+                y.push(item.y);
+            }
+        });
+        x.sort();
+        y.sort();
+        return {
+            x: (x[0] + x[x.length - 1]) / 2,
+            y: (y[0] + y[y.length - 1]) / 2
+        };
+    }
+
     public getMarkList() {
         let _this = this;
         return _this.markList.list;
@@ -397,9 +414,10 @@ export class Marker {
 
     private getEventPosition(event) {
         let scale = this.canvas.getScale();
+        let offset = this.canvas.getOffset();
         return {
-            x: event.pageX / scale,
-            y: event.pageY / scale
+            x: event.pageX / scale - offset.left,
+            y: event.pageY / scale - offset.top
         };
     }
 
@@ -419,39 +437,39 @@ export class Marker {
         let point = this.getEventPosition(event);
         // let item = this.markList.list[itemIndex];
         $.each(this.markList.list, function (index, item) {
-            let style = 'cursor: move;';
+            let style = 'move;';
             let x1 = item.x, x2 = item.x + item.width,
                 y1 = item.y, y2 = item.y + item.height;
 
             if (point.x >= x1 && point.x <= x2 && point.y >= y1 && point.y <= y2) {
                 if (point.x <= x1 + _this.scaleZone) {
                     if (point.y <= y1 + _this.scaleZone) {
-                        style = 'cursor: nw-resize;';
+                        style = 'nw-resize;';
                     } else if (point.y >= y2 - _this.scaleZone) {
-                        style = 'cursor: sw-resize;';
+                        style = 'sw-resize;';
                     } else {
-                        style = 'cursor: w-resize;';
+                        style = 'w-resize;';
                     }
                 } else if (point.x >= x2 - _this.scaleZone) {
                     if (point.y <= y1 + _this.scaleZone) {
-                        style = 'cursor: ne-resize;';
+                        style = 'ne-resize;';
                     } else if (point.y >= y2 - _this.scaleZone) {
-                        style = 'cursor: se-resize;';
+                        style = 'se-resize;';
                     } else {
-                        style = 'cursor: e-resize;';
+                        style = 'e-resize;';
                     }
                 } else if (point.y <= y1 + _this.scaleZone) {
-                    style = 'cursor: n-resize;';
+                    style = 'n-resize;';
                 } else if (point.y >= y2 - _this.scaleZone) {
-                    style = 'cursor: s-resize;';
+                    style = 's-resize;';
                 } else {
-                    style = 'cursor: move;';
+                    style = 'move;';
                 }
             } else {
-                style = 'cursor: default;';
+                style = 'default;';
             }
 
-            _this.canvas.setStyle(style);
+            _this.canvas.setCursorStyle(style);
         });
     }
 
@@ -507,7 +525,7 @@ export class Marker {
                         _this.setGroupCheckedByClick(id);
                         // _this.sortMarkList(index);
                         _this.renderList();
-                        canvas.setStyle('cursor: move');
+                        canvas.setCursorStyle('move');
                         canvas.addEvent(_this, 'mousemove', 'move', _this.selectMove);
                         canvas.addEvent(_this, 'mouseup', 'move', _this.selectUp);
                     }
@@ -517,7 +535,7 @@ export class Marker {
                         _this.setEventType(name);
                         _this.setMarkSelectedById(id, event);
                         // _this.setMarkSelectedByIndex(index);
-                        canvas.setStyle('cursor: move');
+                        canvas.setCursorStyle('move');
                         canvas.addEvent(_this, 'mousemove', 'scalemove', _this.scaleMove);
                         canvas.addEvent(_this, 'mouseup', 'scaleup', _this.scaleUp);
                     }
@@ -528,7 +546,7 @@ export class Marker {
                         _this.setEventOrigin(event);
                         _this.clearMarkSelected();
                         canvas.removeEvent(_this, 'mousemove', 'active');
-                        canvas.setStyle('cursor: default');
+                        canvas.setCursorStyle('default');
                         canvas.addEvent(_this, 'mousemove', 'create', _this.mouseMove);
                         canvas.addEvent(_this, 'mouseup', 'create', _this.mouseUp);
                     }
