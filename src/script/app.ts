@@ -95,8 +95,9 @@ function initAnswerListEvent(paperMarker: PaperMarker): void {
             let input = <HTMLInputElement> $this.get(0);
             let groupId = $this.data('group-id');
             input.select();
+            // paperMarker.setGroupSelectedByCheck(groupId);
             paperMarker.clearMarkSelected();
-            paperMarker.setGroupSelectedByCheck(groupId);
+            paperMarker.renderList();
             setCanvasPosition(paperMarker.getGroupCenterPosition(groupId));
             $this.parent('li').addClass('active')
                 .siblings().removeClass('active');
@@ -115,9 +116,10 @@ function initAnswerListEvent(paperMarker: PaperMarker): void {
                 }
             });
             if (indexArr.length) {
+                // paperMarker.setGroupSelectedByCheck(groupId);
                 paperMarker.clearMarkSelected();
                 paperMarker.setGroupChecked(groupId, indexArr);
-                paperMarker.setGroupSelectedByCheck(groupId);
+                paperMarker.renderList();
             }
             $this.val($this.val().toString().toUpperCase());
         });

@@ -27,18 +27,18 @@ export const Defaults = {
                 check: 1
             },
             color: {
-                normal: 'rgb(0, 0, 255)',
-                active: 'rgb(255, 48, 0)',
-                select: 'rgb(255, 255, 255)',
-                check: 'rgb(0, 255, 0)'
+                normal: '#0081ff',
+                active: '#dd0000',
+                select: '#ff473a',
+                check: '#00da09'
             }
         },
         rect: {
             color: {
-                normal: 'rgb(0, 0, 255)',
-                active: 'rgba(255, 48, 0)',
-                select: 'rgb(255, 255, 255)',
-                check: 'rgb(0, 255, 0)'
+                normal: '#0081ff',
+                active: '#dd0000',
+                select: '#ff473a',
+                check: '#00da09'
             }
         },
         text: {

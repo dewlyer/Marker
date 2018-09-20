@@ -11,22 +11,13 @@ type Position = {
 
 export class Marker {
 
-    public static getSelectPosition(): Position {
-        return Marker.selectPosition;
-    }
-
-    public static setSelectPosition(position: Position): void {
-        Marker.selectPosition = position;
-    }
-
-    private static selectPosition: Position;
-
     private static readonly defaults = Defaults;
     private markList: MarkList;
     private canvas: MarkCanvas;
     private settings: any;
     private zoom: number;
     private scaleZone: number;
+    private selectPosition: Position;
     // private selectedMark: Mark;
     // private selectedOrigin: { x: number, y: number };
     // private selectIndex: null;
@@ -54,6 +45,14 @@ export class Marker {
         $.each(this.markList.list, function (index, item) {
             item.unselect();
         });
+    }
+
+    public getSelectPosition(): Position {
+        return this.selectPosition;
+    }
+
+    public setSelectPosition(position: Position): void {
+        this.selectPosition = position;
     }
 
     public setMarkChecked(item, checked) {
@@ -358,8 +357,8 @@ export class Marker {
 
     private setSelectMarkOffset(event) {
         let position = this.getEventPosition(event);
+        let selectPos = this.getSelectPosition();
         $.each(this.markList.list, function (index, item) {
-            let selectPos = Marker.getSelectPosition();
             let origin = item.getOrigin();
             if (selectPos && item.isSelected()) {
                 item.x = origin.x + position.x - selectPos.x;
@@ -370,8 +369,8 @@ export class Marker {
 
     private updateSelectMarkOrigin(event) {
         let position = this.getEventPosition(event);
+        let selectPos = this.getSelectPosition();
         $.each(this.markList.list, function (index, item) {
-            let selectPos = Marker.getSelectPosition();
             let origin = item.getOrigin();
             if (selectPos && item.isSelected()) {
                 origin.x = origin.x + position.x - selectPos.x;
@@ -384,13 +383,14 @@ export class Marker {
     private resizeSelectMark(event, direction) {
         let _this = this;
         let point = _this.getEventPosition(event);
+        let selectPos = this.getSelectPosition();
         let ways = direction.split(',');
 
         $.each(this.markList.list, function (index, item) {
             let offsetW, offsetH;
             if (item.isSelected()) {
-                offsetW = point.x - Marker.getSelectPosition().x;
-                offsetH = point.y - Marker.getSelectPosition().y;
+                offsetW = point.x - selectPos.x;
+                offsetH = point.y - selectPos.y;
                 $.each(ways, function (i, way) {
                     let origin = item.getOrigin();
                     if (way === 'left') {
@@ -581,7 +581,7 @@ export class Marker {
                         canvas.removeEvent(_this, 'mousemove', 'active');
                         _this.setEventType(name);
                         // _this.clearMarkSelected();
-                        Marker.setSelectPosition(_this.getEventPosition(event));
+                        _this.setSelectPosition(_this.getEventPosition(event));
                         // _this.setMarkSelectedById(id, !event.shiftKey, true);
                         _this.setGroupCheckedByClick(id, false  , true);
                         // _this.sortMarkList(index);
@@ -594,7 +594,7 @@ export class Marker {
                 case 'scale':
                     if (settings.scalable) {
                         _this.setEventType(name);
-                        Marker.setSelectPosition(_this.getEventPosition(event));
+                        _this.setSelectPosition(_this.getEventPosition(event));
                         _this.setMarkSelectedById(id, false, false);
                         // _this.setMarkSelectedByIndex(index);
                         canvas.setCursorStyle('move');
