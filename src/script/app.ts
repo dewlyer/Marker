@@ -67,6 +67,11 @@ const pageData = [
     {x: 773, y: 637, width: 27, height: 16, groupId: '012'},
 ];
 
+let Zoom = {
+    level: [0.25, 0.5, 0.75, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2],
+    index: 4
+};
+
 function setCanvasPosition(position: { x: number, y: number }): void {
     let $container = $('#container');
     $('#canvas').css({
@@ -163,13 +168,19 @@ $(window).on('load', (): void => {
     paperMarker = new PaperMarker(<HTMLCanvasElement> canvas.get(0), imageUrl, option);
 
     events = {
+        selectAllRect(e: HTMLElementEventMap['click']): void {
+            console.log(e);
+            paperMarker.setMarkSelectedAll();
+            paperMarker.renderList();
+        },
         clearRectList(e: HTMLElementEventMap['click']): void {
             console.log(e);
             paperMarker.clear();
         },
         clearRectSelect(e: HTMLElementEventMap['click']): void {
             console.log(e);
-            paperMarker.clearCurrentMark();
+            paperMarker.clearSelectedMark();
+            paperMarker.renderList();
         },
         getRectListInfo(e: HTMLElementEventMap['click']): void {
             console.log(e);
@@ -183,23 +194,36 @@ $(window).on('load', (): void => {
         },
         getRectSelectInfo(e: HTMLElementEventMap['click']): void {
             console.log(e);
-            let selectRect = paperMarker.getSelectedMark();
-            if (selectRect) {
-                let str = `ID: ${selectRect.id} - X: ${selectRect.x} - Y: ${selectRect.y} - `;
-                str += `W: ${selectRect.width} - H: ${selectRect.height}`;
-                console.log(selectRect);
+            let selectRectList = paperMarker.getSelectedMarks();
+            if (selectRectList.length) {
+                let str = '';
+                $.each(selectRectList, function (index, item) {
+                    str += `ID: ${item.id} - X: ${item.x} - Y: ${item.y} - `;
+                    str += `W: ${item.width} - H: ${item.height} \n`;
+                });
+                console.log(str);
                 window.alert(str);
             } else {
                 window.alert('没有选中的目标');
             }
         },
         setRectScaleUp(e: HTMLElementEventMap['click']): void {
+            if (Zoom.index >= Zoom.level.length - 1) {
+                window.alert('已放大至最大级别');
+            } else {
+                Zoom.index++;
+                paperMarker.setZoom(Zoom.level[Zoom.index]);
+            }
             console.log(e);
-            paperMarker.setZoom(2);
         },
         setRectScaleDown(e: HTMLElementEventMap['click']): void {
+            if (Zoom.index <= 0) {
+                window.alert('已缩小至最小级别');
+            } else {
+                Zoom.index--;
+                paperMarker.setZoom(Zoom.level[Zoom.index]);
+            }
             console.log(e);
-            paperMarker.setZoom(0.5);
         },
         clearRectSelectKey(e: HTMLElementEventMap['keyup']): void {
             if (e.code === '8' || e.code === '46') {
@@ -218,6 +242,6 @@ $(window).on('load', (): void => {
             }
         }
         initAnswerListEvent(paperMarker);
-        $('.answer-list').find('input[data-group-id]').first().trigger('focusin');
+        // $('.answer-list').find('input[data-group-id]').first().trigger('focusin');
     });
 });

@@ -54,7 +54,8 @@ export class MarkCanvas {
     // draw
 
     public drawBackground(): void {
-        this.ctx.drawImage(this.image.getElement(), 0, 0, this.size.width, this.size.height);
+        this.setElSize();
+        this.ctx.drawImage(this.image.getElement(), 0, 0, this.size.width * this.scale, this.size.height * this.scale);
     }
 
     public drawCreatingMark(current: Mark): void {
@@ -158,7 +159,6 @@ export class MarkCanvas {
             if (_this.image.hasSource()) {
                 let size = this.image.getSize();
                 this.setSize(size);
-                this.setElSize();
                 if (typeof callback === 'function') {
                     callback();
                 }

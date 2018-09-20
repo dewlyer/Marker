@@ -5,18 +5,24 @@
 }
 
 html {
+  width: 100%;
+  height: 100%;
   background: #ddd;
 }
 
 body {
-  background: #ddd;
+  width: 100%;
+  height: 100%;
   font-size: 12px;
+  background: #ddd;
 }
 
 .canvas-wrap {
   min-width: 1300px;
-  padding-top: 50px;
-  padding-left: 80px;
+  //padding-top: 50px;
+  //padding-left: 80px;
+  padding-right: 250px;
+  height: 100%;
   &:after {
     content: '';
     display: table;
@@ -26,27 +32,34 @@ body {
 .canvas-scroll {
   position: relative;
   float: left;
-  width: 1000px;
-  height: 600px;
+  width: 100%;
+  height: 100%;
+  margin-right: 50px;
   overflow: hidden;
   background: #999;
   box-shadow: 0 1px 3px 1px rgba(0, 0, 0, 0.25);
 }
 
 .canvas-buts {
-  display: none;
-  position: fixed;
-  z-index: 10;
+  position: absolute;
   right: 0;
   top: 0;
+  z-index: 10;
+  > div {
+    float: left;
+  }
 }
 
 .canvas-button {
   margin-right: 10px;
   margin-top: 10px;
-  padding: 10px 15px;
+  padding: 3px 8px;
   background: #666;
   color: #fff;
+  border-radius: 30px;
+  opacity: 0.7;
+  outline: none;
+  cursor: pointer;
 }
 
 .canvas {
@@ -56,15 +69,18 @@ body {
 }
 
 .answer-list {
-  //position: absolute;
-  //left: 650px;
-  //top: 360px;
+  position: absolute;
+  right: 0;
+  top: 0;
   float: left;
-  height: 588px;
+  width: 210px;
+  height: 100%;
+  overflow: auto;
+  overflow-x: hidden;
   background: #fff;
   line-height: 28px;
   list-style: none;
-  padding: 6px 20px;
+  padding: 0 20px;
   font-size: 14px;
   box-shadow: 0 1px 3px 1px rgba(0, 0, 0, 0.25);
   li {
@@ -74,9 +90,6 @@ body {
     border-radius: 30px;
     text-align: right;
     &.title {
-      margin: 0;
-      padding-top: 0;
-      padding-bottom: 0;
       background: none;
       border-color: #fff;
     }

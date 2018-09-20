@@ -157,20 +157,22 @@ export class Marker {
         return _this.markList.list;
     }
 
-    public getSelectedMark() {
-        let _this = this;
-        let index = _this.getSelectedMarkIndex();
-        if (index !== null) {
-            return _this.markList.list[index];
-        }
+    public getSelectedMarks(): Mark[] {
+        let selectList: Mark[] = [];
+        $.each(this.markList.list, function (index, item) {
+            if (item.isSelected()) {
+                selectList.push(item);
+            }
+        });
+        return selectList;
     }
 
     public setZoom(zoom: number): void {
-        let scale;
         this.zoom = zoom;
-        scale = this.canvas.getScale();
-        scale *= this.zoom;
-        this.canvas.setScale(scale);
+        // let scale;
+        // scale = this.canvas.getScale();
+        // scale *= this.zoom;
+        this.canvas.setScale(this.zoom );
         this.renderList();
     }
 
@@ -205,13 +207,27 @@ export class Marker {
     }
 
     public clearCurrentMark() {
-        let itemIndex = this.getSelectedMarkIndex();
+        let itemIndex = this.getSelectedMarksIndex();
         let id;
         if (itemIndex !== null && (this.eventType === 'none' || this.eventType === 'default')) {
             id = this.markList.getItemById(itemIndex).id;
             this.clearMark(id);
             this.removeEvent();
         }
+    }
+
+    public clearSelectedMark() {
+        let _this = this;
+        let idArr = [];
+        $.each(this.markList.list, function (index, item) {
+            if (item.isSelected()) {
+                idArr.push(item.id);
+            }
+        });
+        $.each(idArr, function (index, id) {
+            _this.clearMark(id);
+            _this.removeEvent();
+        });
     }
 
     public clear() {
@@ -246,6 +262,12 @@ export class Marker {
         }
 
         this.markList.current = new Mark(id, x, y, width, height);
+    }
+
+    public setMarkSelectedAll(): void {
+        $.each(this.markList.list, (index, item) => {
+            item.select();
+        });
     }
 
     private addCurrentToList() {
@@ -285,7 +307,7 @@ export class Marker {
         return index;
     }
 
-    private getSelectedMarkIndex(): number | null {
+    private getSelectedMarksIndex(): number | null {
         let markIndex = null;
         $.each(this.markList.list, (index, item) => {
             if (item.isSelected()) {
@@ -421,7 +443,7 @@ export class Marker {
         let _this = this;
         let action = {name: 'append', index: 0, id: '', direction: ''};
         let point = _this.getEventPosition(event);
-        // let itemIndex = _this.getSelectedMarkIndex();
+        // let itemIndex = _this.getSelectedMarksIndex();
 
         $.each(this.markList.list, function (index, item) {
             let x1 = item.x, x2 = item.x + item.width,
@@ -476,8 +498,8 @@ export class Marker {
         let scale = this.canvas.getScale();
         let offset = this.canvas.getOffset();
         return {
-            x: event.pageX / scale - offset.left,
-            y: event.pageY / scale - offset.top
+            x: (event.pageX - offset.left) / scale,
+            y: (event.pageY - offset.top) / scale
         };
     }
 
