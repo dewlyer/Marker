@@ -1,11 +1,6 @@
 /**
  * Mark Class
  */
-type Position = {
-    x: number;
-    y: number;
-};
-
 export interface MarkInterface {
     readonly id: string;
     x: number;
@@ -15,23 +10,12 @@ export interface MarkInterface {
 }
 
 export class Mark implements MarkInterface {
-    public static getSelectPosition(): Position {
-        return Mark.selectPosition;
-    }
-
-    public static setSelectPosition(position: Position): void {
-        Mark.selectPosition = position;
-    }
-
-    private static selectPosition: Position;
-
-    public origin: {
+    private origin: {
         x: number,
         y: number
         width: number,
         height: number,
     };
-
     private readonly groupId: string;
     private selected: boolean;
     private checked: boolean;
@@ -45,12 +29,10 @@ export class Mark implements MarkInterface {
         groupId?: string,
         checked?: boolean
     ) {
-        if (!!groupId) {
+        if (typeof groupId === 'string') {
             this.groupId = groupId;
         }
-        this.selected = false;
-        this.checked = !!checked;
-        this.initialize();
+        this.initialize(checked);
     }
 
     public get id(): string {
@@ -113,7 +95,15 @@ export class Mark implements MarkInterface {
         return this.checked;
     }
 
-    public setOriginPosition(): void {
+    public getOrigin() {
+        return this.origin;
+    }
+
+    public setOrigin(origin) {
+        return this.origin = origin;
+    }
+
+    public initOrigin(): void {
         this.origin = {
             width: this._width,
             height: this._height,
@@ -122,7 +112,9 @@ export class Mark implements MarkInterface {
         };
     }
 
-    private initialize(): void {
-        this.setOriginPosition();
+    private initialize(checked?: boolean): void {
+        this.selected = false;
+        this.checked = !!checked;
+        this.initOrigin();
     }
 }
