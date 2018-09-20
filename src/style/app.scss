@@ -48,6 +48,26 @@ body {
   > div {
     float: left;
   }
+  .switch {
+    display: block;
+    margin-top: 10px;
+    margin-right: 15px;
+    padding: 3px 8px;
+    background: #666;
+    opacity: 0.7;
+    border-radius: 30px;
+    color: #fff;
+    em {
+      padding: 0 8px;
+      font-style: normal;
+      vertical-align: top;
+    }
+    input {
+      width: 32px;
+      vertical-align: top;
+      cursor: pointer;
+    }
+  }
 }
 
 .canvas-button {
@@ -84,7 +104,7 @@ body {
   font-size: 14px;
   box-shadow: 0 1px 3px 1px rgba(0, 0, 0, 0.25);
   li {
-    margin: 5px 0;
+    margin: 10px 0;
     padding: 5px 10px;
     border: 1px dashed #ddd;
     border-radius: 30px;
@@ -101,7 +121,7 @@ body {
       text-align: center;
     }
     input {
-      width: 120px;
+      width: 110px;
       height: 28px;
       line-height: 28px;
       text-align: center;

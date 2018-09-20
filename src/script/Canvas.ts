@@ -39,15 +39,15 @@ export class MarkCanvas {
         // this.el.setAttribute('style', style);
     }
 
-    public addEvent(scope, type, namespace, listener) {
+    public addEvent(type, namespace, listener) {
         $(this.el).on(type + '.' + namespace, (e) => {
             if (e.button === 0) {
-                listener(e, scope);
+                listener(e);
             }
         });
     }
 
-    public removeEvent(scope, type, namespace) {
+    public removeEvent(type, namespace) {
         $(this.el).off(type + '.' + namespace);
     }
 

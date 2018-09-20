@@ -12,7 +12,7 @@ const WebpackConfig: webpack.Configuration = {
     output: {
         filename: '[name].bundle.js',
         path: path.resolve(__dirname, 'dist'),
-        library: 'module.[name]',
+        library: 'module',
         libraryTarget: 'umd'
     },
     mode: 'development',

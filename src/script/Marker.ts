@@ -270,6 +270,15 @@ export class Marker {
         });
     }
 
+    public moveSelectedMark(offset) {
+        $.each(this.markList.list, function (index, item) {
+            if (item.isSelected()) {
+                item.x += offset.x;
+                item.y += offset.y;
+            }
+        });
+    }
+
     private addCurrentToList() {
         let _this = this;
         _this.markList.list.push(_this.markList.current);
@@ -558,11 +567,11 @@ export class Marker {
     // events
 
     private handleEvent() {
-        this.canvas.addEvent(this, 'mousedown', 'start', this.mouseDown);
+        this.canvas.addEvent('mousedown', 'start', this.mouseDown);
     }
 
     private removeEvent() {
-        this.canvas.removeEvent(this, 'mousemove', 'start');
+        this.canvas.removeEvent('mousemove', 'start');
     }
 
     // clear
@@ -600,7 +609,7 @@ export class Marker {
             switch (name) {
                 case 'move':
                     if (settings.draggable) {
-                        canvas.removeEvent(_this, 'mousemove', 'active');
+                        canvas.removeEvent('mousemove', 'active');
                         _this.setEventType(name);
                         // _this.clearMarkSelected();
                         _this.setSelectPosition(_this.getEventPosition(event));
@@ -609,8 +618,8 @@ export class Marker {
                         // _this.sortMarkList(index);
                         _this.renderList();
                         // canvas.setCursorStyle('move');
-                        canvas.addEvent(_this, 'mousemove', 'move', _this.selectMove);
-                        canvas.addEvent(_this, 'mouseup', 'move', _this.selectUp);
+                        canvas.addEvent('mousemove', 'move', _this.selectMove);
+                        canvas.addEvent('mouseup', 'move', _this.selectUp);
                     }
                     break;
                 case 'scale':
@@ -620,8 +629,8 @@ export class Marker {
                         _this.setMarkSelectedById(id, false, false);
                         // _this.setMarkSelectedByIndex(index);
                         canvas.setCursorStyle('move');
-                        canvas.addEvent(_this, 'mousemove', 'scalemove', _this.scaleMove);
-                        canvas.addEvent(_this, 'mouseup', 'scaleup', _this.scaleUp);
+                        canvas.addEvent('mousemove', 'scalemove', _this.scaleMove);
+                        canvas.addEvent('mouseup', 'scaleup', _this.scaleUp);
                     }
                     break;
                 default:
@@ -630,19 +639,18 @@ export class Marker {
                     _this.clearMarkSelected();
                     _this.renderList();
                     canvas.setCursorStyle('default');
-                    canvas.removeEvent(_this, 'mousemove', 'active');
+                    canvas.removeEvent('mousemove', 'active');
                     if (settings.creatable) {
-                        canvas.addEvent(_this, 'mousemove', 'create', _this.mouseMove);
-                        canvas.addEvent(_this, 'mouseup', 'create', _this.mouseUp);
+                        canvas.addEvent('mousemove', 'create', _this.mouseMove);
+                        canvas.addEvent('mouseup', 'create', _this.mouseUp);
                     } else if (event.metaKey || event.ctrlKey) {
-                        canvas.addEvent(_this, 'mousemove', 'select', _this.multipleSelectMove);
-                        canvas.addEvent(_this, 'mouseup', 'select', _this.multipleSelectUp);
+                        canvas.addEvent('mousemove', 'select', _this.multipleSelectMove);
+                        canvas.addEvent('mouseup', 'select', _this.multipleSelectUp);
                     } else {
-                        canvas.addEvent(_this, 'mousemove', 'drag', _this.dragCanvasStart);
-                        canvas.addEvent(_this, 'mouseup', 'drag', _this.dragCanvasEnd);
+                        canvas.addEvent('mousemove', 'drag', _this.dragCanvasStart);
+                        canvas.addEvent('mouseup', 'drag', _this.dragCanvasEnd);
                     }
             }
-            return false;
         };
         this.mouseMove = (event) => {
             _this.setCurrent(event);
@@ -657,8 +665,8 @@ export class Marker {
                 alert('所选区域太小，请重现选取！');
             }
             _this.renderList();
-            _this.canvas.removeEvent(_this, 'mousemove', 'create');
-            _this.canvas.removeEvent(_this, 'mouseup', 'create');
+            _this.canvas.removeEvent('mousemove', 'create');
+            _this.canvas.removeEvent('mouseup', 'create');
         };
         this.multipleSelectMove = (event) => {
             _this.setCurrent(event);
@@ -672,8 +680,8 @@ export class Marker {
             // }
             _this.setMarkSelectedByBox(_this.getCurrent());
             _this.renderList();
-            _this.canvas.removeEvent(_this, 'mousemove', 'select');
-            _this.canvas.removeEvent(_this, 'mouseup', 'select');
+            _this.canvas.removeEvent('mousemove', 'select');
+            _this.canvas.removeEvent('mouseup', 'select');
         };
         this.selectMove = (event) => {
             _this.setSelectMarkOffset(event);
@@ -682,9 +690,9 @@ export class Marker {
         this.selectUp = (event) => {
             _this.updateSelectMarkOrigin(event);
             _this.setEventType('none');
-            _this.canvas.removeEvent(_this, 'mousemove', 'move');
-            _this.canvas.removeEvent(_this, 'mouseup', 'move');
-            _this.canvas.addEvent(_this, 'mousemove', 'active', _this.activeMove);
+            _this.canvas.removeEvent('mousemove', 'move');
+            _this.canvas.removeEvent('mouseup', 'move');
+            _this.canvas.addEvent('mousemove', 'active', _this.activeMove);
         };
         this.scaleMove = (event) => {
             _this.resizeSelectMark(event, _this.action.direction);
@@ -692,8 +700,8 @@ export class Marker {
         };
         this.scaleUp = () => {
             _this.eventType = 'none';
-            _this.canvas.removeEvent(_this, 'mousemove', 'scalemove');
-            _this.canvas.removeEvent(_this, 'mouseup', 'scaleup');
+            _this.canvas.removeEvent('mousemove', 'scalemove');
+            _this.canvas.removeEvent('mouseup', 'scaleup');
         };
         this.activeMove = (event) => {
             _this.setCursorStyle(event);
@@ -704,8 +712,8 @@ export class Marker {
         };
         this.dragCanvasEnd = () => {
             _this.canvas.setCursorStyle('default');
-            _this.canvas.removeEvent(_this, 'mousemove', 'drag');
-            _this.canvas.removeEvent(_this, 'mouseup', 'drag');
+            _this.canvas.removeEvent('mousemove', 'drag');
+            _this.canvas.removeEvent('mouseup', 'drag');
             _this.settings.endDrag();
         };
     }

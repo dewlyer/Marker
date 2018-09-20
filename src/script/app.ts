@@ -74,10 +74,14 @@ let Zoom = {
 
 function setCanvasPosition(position: { x: number, y: number }): void {
     let $container = $('#container');
-    $('#canvas').css({
+    // $('#canvas').css({
+    //     left: $container.width() / 2 - position.x,
+    //     top: $container.height() / 2 - position.y
+    // });
+    $('#canvas').animate({
         left: $container.width() / 2 - position.x,
         top: $container.height() / 2 - position.y
-    });
+    }, '300');
 }
 
 function updateDraggingPosition(coords, x, y) {
@@ -91,6 +95,66 @@ function updateDraggingPosition(coords, x, y) {
     coords.x = x;
     coords.y = y;
     return coords;
+}
+
+function initKeyboardShortcut(): void {
+    $(document).on('keydown.shortcut', function (event) {
+        if (event.ctrlKey || event.metaKey) {
+            switch (event.keyCode) {
+                case 65:
+                    $('#selectAllRect').trigger('click');
+                    event.preventDefault();
+                    break;
+                case 68:
+                    $('#clearRectList').trigger('click');
+                    event.preventDefault();
+                    break;
+                case 8:
+                    $('#clearRectSelect').trigger('click');
+                    event.preventDefault();
+                    break;
+                case 107:
+                case 187:
+                    $('#setRectScaleUp').trigger('click');
+                    event.preventDefault();
+                    break;
+                case 109:
+                case 189:
+                    $('#setRectScaleDown').trigger('click');
+                    event.preventDefault();
+                    break;
+                case 79:
+                    $('#getRectListInfo').trigger('click');
+                    event.preventDefault();
+                    break;
+                case 73:
+                    $('#getRectSelectInfo').trigger('click');
+                    event.preventDefault();
+                    break;
+            }
+        }
+    });
+}
+
+function initKeyboardMove(callback: Function): void {
+    $(document).on('keydown.move', function (event) {
+        let offset = {x: 0, y: 0};
+        switch (event.keyCode) {
+            case 37:
+                offset.x = -1; // 左
+                break;
+            case 38:
+                offset.y = -1; // 上
+                break;
+            case 39:
+                offset.x = 1; // 右
+                break;
+            case 40:
+                offset.y = 1; // 下
+                break;
+        }
+        callback(offset);
+    });
 }
 
 function initAnswerListEvent(paperMarker: PaperMarker): void {
@@ -241,7 +305,12 @@ $(window).on('load', (): void => {
                     document.getElementById(key).addEventListener('click', listener);
             }
         }
+        initKeyboardShortcut();
         initAnswerListEvent(paperMarker);
+        initKeyboardMove(function (offset) {
+            paperMarker.moveSelectedMark(offset);
+            paperMarker.renderList();
+        });
         // $('.answer-list').find('input[data-group-id]').first().trigger('focusin');
     });
 });
