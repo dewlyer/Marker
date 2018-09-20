@@ -1,7 +1,7 @@
 // import bg from '../images/bg.jpg';
 import '../style/app.scss';
 import * as $ from 'jquery';
-import {Marker as PaperMarker} from './Marker';
+import { Marker as PaperMarker } from './Marker';
 
 const AnswerList = 'ABCD';
 const pageData = [
@@ -67,10 +67,9 @@ const pageData = [
     {x: 773, y: 637, width: 27, height: 16, groupId: '012'},
 ];
 
-function setCanvasPosition(position) {
+function setCanvasPosition(position: { x: number, y: number }): void {
     let $container = $('#container');
-    let $target = $('#canvas');
-    $target.css({
+    $('#canvas').css({
         left: $container.width() / 2 - position.x,
         top: $container.height() / 2 - position.y
     });
@@ -78,8 +77,8 @@ function setCanvasPosition(position) {
 
 function updateDraggingPosition(coords, x, y) {
     let $target = $('#canvas');
-    let left = parseInt($target.css('left'), 10);
-    let top = parseInt($target.css('top'), 10);
+    let left: number = parseInt($target.css('left'), 10);
+    let top: number = parseInt($target.css('top'), 10);
     $target.css({
         left: left + x - coords.x,
         top: top + y - coords.y
@@ -89,7 +88,7 @@ function updateDraggingPosition(coords, x, y) {
     return coords;
 }
 
-function initAnswerListEvent(paperMarker) {
+function initAnswerListEvent(paperMarker: PaperMarker): void {
     $('.answer-list')
         .on('focus', 'input', function () {
             let $this = $(this);
@@ -98,8 +97,7 @@ function initAnswerListEvent(paperMarker) {
             input.select();
             paperMarker.clearMarkSelected();
             paperMarker.setGroupSelectedByCheck(groupId);
-            let pos = paperMarker.getGroupCenterPosition(groupId);
-            setCanvasPosition(pos);
+            setCanvasPosition(paperMarker.getGroupCenterPosition(groupId));
             $this.parent('li').addClass('active')
                 .siblings().removeClass('active');
         })
@@ -121,7 +119,6 @@ function initAnswerListEvent(paperMarker) {
                 paperMarker.setGroupChecked(groupId, indexArr);
                 paperMarker.setGroupSelectedByCheck(groupId);
             }
-
             $this.val($this.val().toString().toUpperCase());
         });
 }
@@ -219,6 +216,6 @@ $(window).on('load', (): void => {
             }
         }
         initAnswerListEvent(paperMarker);
-        // $('.answer-list').find('input[data-group-id]').first().trigger('focusin');
+        $('.answer-list').find('input[data-group-id]').first().trigger('focusin');
     });
 });
