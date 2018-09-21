@@ -83,25 +83,30 @@ export class MarkCanvas {
         this.ctx.fillStyle = this.style.rect.color.normal;
         this.ctx.globalAlpha = this.style.opacity;
 
+        // this.ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+        // this.ctx.shadowOffsetX = 2;
+        // this.ctx.shadowOffsetY = 2;
+        // this.ctx.shadowBlur = 5;
+
         $.each(markList.list, (index, item) => {
             if (item.isSelected()) {
                 _this.ctx.save();
                 _this.ctx.strokeStyle = _this.style.line.color.select;
                 _this.ctx.fillStyle = _this.style.rect.color.select;
                 _this.ctx.lineWidth = _this.style.line.width.select;
-                _this.ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-                _this.ctx.shadowOffsetX = 0;
-                _this.ctx.shadowOffsetY = 2;
-                _this.ctx.shadowBlur = 3;
+                // _this.ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                // _this.ctx.shadowOffsetX = 0;
+                // _this.ctx.shadowOffsetY = 2;
+                // _this.ctx.shadowBlur = 3;
             } else if (item.isChecked()) {
                 _this.ctx.save();
                 _this.ctx.strokeStyle = _this.style.line.color.check;
                 _this.ctx.fillStyle = _this.style.rect.color.check;
                 _this.ctx.lineWidth = _this.style.line.width.check;
-                _this.ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-                _this.ctx.shadowOffsetX = 0;
-                _this.ctx.shadowOffsetY = 2;
-                _this.ctx.shadowBlur = 3;
+                // _this.ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                // _this.ctx.shadowOffsetX = 0;
+                // _this.ctx.shadowOffsetY = 2;
+                // _this.ctx.shadowBlur = 3;
             }
             _this.ctx.fillRect(
                 item.x * _this.scale,
