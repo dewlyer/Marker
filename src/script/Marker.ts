@@ -646,8 +646,7 @@ export class Marker {
                         // _this.sortMarkList(index);
                         _this.renderList();
                         // canvas.setCursorStyle('move');
-
-                        _this.addHistory();
+·                        _this.addHistory();
                         canvas.addEvent('mousemove', 'move', _this.selectMove);
                         canvas.addEvent('mouseup', 'move', _this.selectUp);
                     }
