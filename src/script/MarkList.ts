@@ -1,3 +1,4 @@
+import * as $ from 'jquery';
 import { Mark } from './Mark';
 
 /**
@@ -42,8 +43,18 @@ export class MarkList implements MarkListInterface {
     }
 
     public clone(markList: MarkList) {
-        this._list = markList.list;
-        this._current = markList.current;
+        let current: Mark = new Mark('', 0, 0, 0, 0);
+        current.clone(markList.current);
+
+        let list: Mark[] = [];
+        $.each(markList.list, function (index, mark) {
+            let m = new Mark('', 0, 0, 0, 0);
+            m.clone(mark);
+            list.push(m);
+        });
+
+        this._list = list;
+        this._current = current;
     }
 
     private initialize(list): void {

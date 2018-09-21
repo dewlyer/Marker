@@ -11,17 +11,17 @@ export interface MarkInterface {
 
 export class Mark implements MarkInterface {
     private origin: {
-        x: number,
-        y: number
-        width: number,
-        height: number,
+        x: number;
+        y: number;
+        width: number;
+        height: number;
     };
-    private readonly groupId: string;
+    private groupId: string;
     private selected: boolean;
     private checked: boolean;
 
     public constructor(
-        private readonly _id: string,
+        private _id: string,
         private _x: number,
         private _y: number,
         private _width: number,
@@ -101,6 +101,24 @@ export class Mark implements MarkInterface {
 
     public setOrigin(origin) {
         return this.origin = origin;
+    }
+
+    public clone(mark: Mark) {
+        this._id = mark.id;
+        this._x = mark.x;
+        this._y = mark.y;
+        this.width = mark.width;
+        this.height = mark.height;
+        this.groupId = mark.getGroupId();
+        this.selected = mark.isSelected();
+        this.checked = mark.isChecked();
+        let origin = mark.getOrigin();
+        this.origin = {
+            x: origin.x,
+            y: origin.y,
+            width: origin.width,
+            height: origin.height
+        };
     }
 
     public initOrigin(): void {

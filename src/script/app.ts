@@ -131,6 +131,14 @@ function initKeyboardShortcut(): void {
                     $('#getRectSelectInfo').trigger('click');
                     event.preventDefault();
                     break;
+                case 82:
+                    $('#redo').trigger('click');
+                    event.preventDefault();
+                    break;
+                case 90:
+                    $('#undo').trigger('click');
+                    event.preventDefault();
+                    break;
             }
         }
     });
@@ -239,16 +247,13 @@ $(window).on('load', (): void => {
             paperMarker.redo();
         },
         selectAllRect(e: HTMLElementEventMap['click']): void {
-            console.log(e);
             paperMarker.setMarkSelectedAll();
             paperMarker.renderList();
         },
         clearRectList(e: HTMLElementEventMap['click']): void {
-            console.log(e);
             paperMarker.clear();
         },
         clearRectSelect(e: HTMLElementEventMap['click']): void {
-            console.log(e);
             paperMarker.clearSelectedMark();
             paperMarker.renderList();
         },

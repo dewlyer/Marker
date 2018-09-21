@@ -42,6 +42,7 @@ export class Marker {
 
     private undoManager;
     private historyData: Array<MarkList>;
+    private latestData: MarkList;
 
     public constructor(canvas: HTMLCanvasElement, imageUrl: string, options?: any) {
         this.initialize(canvas, imageUrl, options);
@@ -246,15 +247,18 @@ export class Marker {
                 idArr.push(item.id);
             }
         });
-        $.each(idArr, function (index, id) {
-            _this.clearMark(id);
-            _this.removeEvent();
-        });
+        if (idArr.length) {
+            this.addHistory();
+            $.each(idArr, function (index, id) {
+                _this.clearMark(id);
+                _this.removeEvent();
+            });
+            this.saveLatestData();
+        }
     }
 
     public clear() {
         if (this.eventType === 'none' || this.eventType === 'default') {
-            this.addHistory();
             this.clearMarkList();
             this.renderList();
         }
@@ -376,7 +380,6 @@ export class Marker {
     }
 
     private setMarkSelectedByBox(box) {
-        console.log(box);
         $.each(this.markList.list, function (index, item) {
             // TODO
             if (item.x >= box.x && item.x <= (box.x + box.width) && item.y >= box.y && item.y <= (box.y + box.height)) {
@@ -641,6 +644,8 @@ export class Marker {
                         // _this.sortMarkList(index);
                         _this.renderList();
                         // canvas.setCursorStyle('move');
+
+                        _this.addHistory();
                         canvas.addEvent('mousemove', 'move', _this.selectMove);
                         canvas.addEvent('mouseup', 'move', _this.selectUp);
                     }
@@ -713,6 +718,7 @@ export class Marker {
             _this.renderList();
         };
         this.selectUp = (event) => {
+            _this.saveLatestData();
             _this.updateSelectMarkOrigin(event);
             _this.setEventType('none');
             _this.canvas.removeEvent('mousemove', 'move');
@@ -743,9 +749,18 @@ export class Marker {
         };
     }
 
+    private saveLatestData() {
+        this.latestData = this.markList;
+    }
+
     private addHistory(undo?: Function, redo?: Function) {
         let _this = this;
         let newList = new MarkList([]);
+        console.log(this.historyData);
+        if (this.undoManager.hasRedo()) {
+            // TODO
+            this.historyData.length = this.undoManager.getIndex() + 1;
+        }
         newList.clone(this.markList);
         this.historyData.push(newList);
         this.undoManager.add({
@@ -754,6 +769,7 @@ export class Marker {
                     undo();
                 }
                 let index = _this.undoManager.getIndex();
+                console.log(index);
                 _this.markList = _this.historyData[index];
                 _this.renderList();
             },
@@ -761,8 +777,14 @@ export class Marker {
                 if (typeof redo === 'function') {
                     redo();
                 }
-                let index = _this.undoManager.getIndex();
-                _this.markList = _this.historyData[index];
+                let index = _this.undoManager.getIndex() + 2;
+                console.log(index);
+                if (index >= _this.historyData.length && !!_this.latestData) {
+                    _this.markList = _this.latestData;
+                } else {
+                    _this.markList = _this.historyData[index];
+                }
+                console.log(_this.markList);
                 _this.renderList();
             }
         });
