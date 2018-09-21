@@ -41,6 +41,11 @@ export class MarkList implements MarkListInterface {
         return this._list[0];
     }
 
+    public clone(markList: MarkList) {
+        this._list = markList.list;
+        this._current = markList.current;
+    }
+
     private initialize(list): void {
         this._list = list;
         this._current = list[0];

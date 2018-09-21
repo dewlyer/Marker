@@ -3,11 +3,13 @@ import { Mark } from './Mark';
 import { MarkList } from './MarkList';
 import { MarkCanvas } from './Canvas';
 import { Defaults } from './Defaults';
+import { UndoManager } from './Undo';
 
 type Position = {
     x: number;
     y: number;
 };
+
 
 export class Marker {
 
@@ -31,14 +33,34 @@ export class Marker {
     private selectUp: Function;
     private multipleSelectMove: Function;
     private multipleSelectUp: Function;
+    private multipleSelectEnabled: boolean;
     private scaleMove: Function;
     private scaleUp: Function;
     private activeMove: Function;
     private dragCanvasStart: Function;
     private dragCanvasEnd: Function;
 
+    private undoManager;
+    private historyData: Array<MarkList>;
+
     public constructor(canvas: HTMLCanvasElement, imageUrl: string, options?: any) {
         this.initialize(canvas, imageUrl, options);
+    }
+
+    public setMultipleSelectEnabled(status: boolean) {
+        this.multipleSelectEnabled = status;
+    }
+
+    public undo() {
+        if (this.undoManager.hasUndo()) {
+            this.undoManager.undo();
+        }
+    }
+
+    public redo() {
+        if (this.undoManager.hasRedo()) {
+            this.undoManager.redo();
+        }
     }
 
     public clearMarkSelected() {
@@ -232,6 +254,7 @@ export class Marker {
 
     public clear() {
         if (this.eventType === 'none' || this.eventType === 'default') {
+            this.addHistory();
             this.clearMarkList();
             this.renderList();
         }
@@ -643,12 +666,14 @@ export class Marker {
                     if (settings.creatable) {
                         canvas.addEvent('mousemove', 'create', _this.mouseMove);
                         canvas.addEvent('mouseup', 'create', _this.mouseUp);
-                    } else if (event.metaKey || event.ctrlKey) {
-                        canvas.addEvent('mousemove', 'select', _this.multipleSelectMove);
-                        canvas.addEvent('mouseup', 'select', _this.multipleSelectUp);
                     } else {
-                        canvas.addEvent('mousemove', 'drag', _this.dragCanvasStart);
-                        canvas.addEvent('mouseup', 'drag', _this.dragCanvasEnd);
+                        if (_this.multipleSelectEnabled || event.metaKey || event.ctrlKey) {
+                            canvas.addEvent('mousemove', 'select', _this.multipleSelectMove);
+                            canvas.addEvent('mouseup', 'select', _this.multipleSelectUp);
+                        } else {
+                            canvas.addEvent('mousemove', 'drag', _this.dragCanvasStart);
+                            canvas.addEvent('mouseup', 'drag', _this.dragCanvasEnd);
+                        }
                     }
             }
         };
@@ -718,6 +743,36 @@ export class Marker {
         };
     }
 
+    private addHistory(undo?: Function, redo?: Function) {
+        let _this = this;
+        let newList = new MarkList([]);
+        newList.clone(this.markList);
+        this.historyData.push(newList);
+        this.undoManager.add({
+            undo: function () {
+                if (typeof undo === 'function') {
+                    undo();
+                }
+                let index = _this.undoManager.getIndex();
+                _this.markList = _this.historyData[index];
+                _this.renderList();
+            },
+            redo: function () {
+                if (typeof redo === 'function') {
+                    redo();
+                }
+                let index = _this.undoManager.getIndex();
+                _this.markList = _this.historyData[index];
+                _this.renderList();
+            }
+        });
+    }
+
+    private initHistory() {
+        this.undoManager = new UndoManager();
+        this.historyData = [];
+    }
+
     private initialize(canvas, imageUrl, options): void {
         this.settings = $.extend({}, Marker.defaults, options || {});
         this.canvas = new MarkCanvas(canvas, imageUrl, this.settings.style);
@@ -726,6 +781,8 @@ export class Marker {
         this.eventOrigin = {x: 0, y: 0};
         this.markList = new MarkList([]);
         this.eventType = 'none';
+        this.multipleSelectEnabled = false;
         this.initEvents();
+        this.initHistory();
     }
 }

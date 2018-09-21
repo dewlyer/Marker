@@ -232,6 +232,12 @@ $(window).on('load', (): void => {
     paperMarker = new PaperMarker(<HTMLCanvasElement> canvas.get(0), imageUrl, option);
 
     events = {
+        undo(e: HTMLElementEventMap['click']): void {
+            paperMarker.undo();
+        },
+        redo(e: HTMLElementEventMap['click']): void {
+            paperMarker.redo();
+        },
         selectAllRect(e: HTMLElementEventMap['click']): void {
             console.log(e);
             paperMarker.setMarkSelectedAll();
@@ -310,6 +316,12 @@ $(window).on('load', (): void => {
         initKeyboardMove(function (offset) {
             paperMarker.moveSelectedMark(offset);
             paperMarker.renderList();
+        });
+
+        $('#multipleSelectStaus').on('change', function () {
+            let value = $(this).val() !== '0';
+            console.log(value);
+            paperMarker.setMultipleSelectEnabled(value);
         });
         // $('.answer-list').find('input[data-group-id]').first().trigger('focusin');
     });
