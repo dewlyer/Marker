@@ -323,10 +323,15 @@ $(window).on('load', (): void => {
             paperMarker.renderList();
         });
 
-        $('#multipleSelectStaus').on('change', function () {
+        $('#multipleSelectStatus').on('change', function () {
             let value = $(this).val() !== '0';
             console.log(value);
             paperMarker.setMultipleSelectEnabled(value);
+        });
+        $('.switch').on('click', 'em[data-val]', function () {
+            let value = $(this).data('val') ;
+            $('#multipleSelectStatus').val(value);
+            paperMarker.setMultipleSelectEnabled(value !== 0);
         });
         // $('.answer-list').find('input[data-group-id]').first().trigger('focusin');
     });
