@@ -43,16 +43,19 @@ export class MarkList implements MarkListInterface {
     }
 
     public clone(markList: MarkList) {
-        let current: Mark = new Mark('', 0, 0, 0, 0);
-        current.clone(markList.current);
-
         let list: Mark[] = [];
-        $.each(markList.list, function (index, mark) {
-            let m = new Mark('', 0, 0, 0, 0);
-            m.clone(mark);
-            list.push(m);
-        });
-
+        let current: Mark;
+        if (markList.list.length) {
+            $.each(markList.list, function (index, mark) {
+                let m = new Mark('', 0, 0, 0, 0);
+                m.clone(mark);
+                list.push(m);
+            });
+        }
+        if (!!markList.current) {
+            current = new Mark('', 0, 0, 0, 0);
+            current.clone(markList.current);
+        }
         this._list = list;
         this._current = current;
     }

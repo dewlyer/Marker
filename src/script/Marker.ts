@@ -259,7 +259,9 @@ export class Marker {
 
     public clear() {
         if (this.eventType === 'none' || this.eventType === 'default') {
+            this.addHistory();
             this.clearMarkList();
+            this.saveLatestData();
             this.renderList();
         }
     }
@@ -756,7 +758,6 @@ export class Marker {
     private addHistory(undo?: Function, redo?: Function) {
         let _this = this;
         let newList = new MarkList([]);
-        console.log(this.historyData);
         if (this.undoManager.hasRedo()) {
             // TODO
             this.historyData.length = this.undoManager.getIndex() + 1;
@@ -769,7 +770,6 @@ export class Marker {
                     undo();
                 }
                 let index = _this.undoManager.getIndex();
-                console.log(index);
                 _this.markList = _this.historyData[index];
                 _this.renderList();
             },
@@ -778,13 +778,13 @@ export class Marker {
                     redo();
                 }
                 let index = _this.undoManager.getIndex() + 2;
-                console.log(index);
-                if (index >= _this.historyData.length && !!_this.latestData) {
-                    _this.markList = _this.latestData;
+                if (index >= _this.historyData.length) {
+                    if (!!_this.latestData) {
+                        _this.markList = _this.latestData;
+                    }
                 } else {
                     _this.markList = _this.historyData[index];
                 }
-                console.log(_this.markList);
                 _this.renderList();
             }
         });
